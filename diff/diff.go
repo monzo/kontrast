@@ -1,6 +1,8 @@
 package diff
 
 import (
+	"log"
+
 	"github.com/milesbxf/petrel/k8s"
 
 	_ "k8s.io/kubernetes/pkg/master"
@@ -9,8 +11,10 @@ import (
 func GetFileDiff(filename string, helper *k8s.ResourceHelper) (Diff, error) {
 	resource, err := helper.NewResourceFromFilename(filename)
 	if err != nil {
+		log.Printf("Error getting resource: %v", err)
 		return EmptyDiff{}, err
 	}
+	log.Printf("Setting defaults for object %v", resource.Object)
 	defaultedObj := k8s.GetWithDefaults(resource.Object)
 	meta := DiffMeta{Resource: resource}
 
@@ -20,8 +24,10 @@ func GetFileDiff(filename string, helper *k8s.ResourceHelper) (Diff, error) {
 	}
 	deltas, err := calculateDiff(defaultedObj, serverObj)
 	if err != nil {
+		log.Printf("Error calculating deltas: %v", err)
 		return EmptyDiff{}, err
 	}
+	log.Printf("Found %d deltas", len(deltas))
 	if len(deltas) == 0 {
 		return EmptyDiff{DiffMeta: meta}, nil
 	} else {

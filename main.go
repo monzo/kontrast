@@ -2,17 +2,16 @@ package main
 
 import (
 	"flag"
-	"io/ioutil"
-	"log"
+	"fmt"
 	"os"
 	"path/filepath"
 
+	"github.com/milesbxf/petrel/diff"
 	"github.com/milesbxf/petrel/k8s"
 )
 
 var (
 	kubeconfig *string
-	showLogs   *bool
 )
 
 func main() {
@@ -21,15 +20,46 @@ func main() {
 	} else {
 		kubeconfig = flag.String("kubeconfig", "", "absolute path to the kubeconfig file")
 	}
-	showLogs = flag.Bool("verbose", false, "Show verbose logging")
 	flag.Parse()
 
-	if !*showLogs {
-		log.SetOutput(ioutil.Discard)
+	if len(os.Args) != 2 {
+		fatal("Program takes a single argument")
 	}
 
-	k8s.LoadConfig(*kubeconfig)
+	filename := os.Args[1]
 
+	config, err := k8s.LoadConfig(*kubeconfig)
+	if err != nil {
+		fatal("error: %f", err)
+	}
+
+	helper, err := k8s.NewResourceHelperWithDefaults(config)
+	if err != nil {
+		fatal("error: %f", err)
+	}
+
+	d, err := diff.GetFileDiff(filename, helper)
+	if err != nil {
+		fatal("error: %f", err)
+	}
+
+	switch d.(type) {
+	case diff.NotPresentOnServerDiff:
+		fmt.Println("Not found")
+	case diff.EmptyDiff:
+		fmt.Println("No changes")
+	case diff.ChangesPresentDiff:
+		fmt.Printf("%d changes found:\n", len(d.Deltas()))
+		for _, d := range d.Deltas() {
+			fmt.Printf("%#v\n", d)
+		}
+	}
+
+}
+
+func fatal(msg string, args ...interface{}) {
+	fmt.Printf(msg+"\n", args)
+	os.Exit(1)
 }
 
 func homeDir() string {

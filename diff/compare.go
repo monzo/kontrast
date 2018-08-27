@@ -11,16 +11,6 @@ import (
 	"github.com/yudai/gojsondiff"
 )
 
-type Item struct {
-	Key   string
-	Value interface{}
-}
-
-type Delta struct {
-	SourceItem Item
-	ServerItem Item
-}
-
 func jsonDiffToDeltas(keyPrefix string, deltas []Delta, jsonDeltas []gojsondiff.Delta) []Delta {
 	for _, d := range jsonDeltas {
 		switch d.(type) {

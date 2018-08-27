@@ -30,42 +30,16 @@ func GetFileDiff(filename string, helper *k8s.ResourceHelper) (Diff, error) {
 	log.Printf("Found %d deltas", len(deltas))
 	if len(deltas) == 0 {
 		return EmptyDiff{DiffMeta: meta}, nil
-	} else {
-		return ChangesPresentDiff{DiffMeta: meta, deltas: deltas}, nil
 	}
+	return ChangesPresentDiff{DiffMeta: meta, deltas: deltas}, nil
 }
 
 var empty = struct{}{}
 
-type Diff interface {
-	Deltas() []Delta
-}
+func (d EmptyDiff) Pretty() string   { return "" }
+func (ed EmptyDiff) Deltas() []Delta { return []Delta{} }
 
-type DiffMeta struct {
-	Resource *k8s.Resource
-}
+func (d ChangesPresentDiff) Deltas() []Delta { return d.deltas }
 
-type EmptyDiff struct {
-	DiffMeta
-}
-
-func (ed EmptyDiff) Deltas() []Delta {
-	return []Delta{}
-}
-
-type ChangesPresentDiff struct {
-	DiffMeta
-	deltas []Delta
-}
-
-func (d ChangesPresentDiff) Deltas() []Delta {
-	return d.deltas
-}
-
-type NotPresentOnServerDiff struct {
-	DiffMeta
-}
-
-func (d NotPresentOnServerDiff) Deltas() []Delta {
-	return []Delta{}
-}
+func (d NotPresentOnServerDiff) Pretty() string  { return "" }
+func (d NotPresentOnServerDiff) Deltas() []Delta { return []Delta{} }

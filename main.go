@@ -3,6 +3,8 @@ package main
 import (
 	"flag"
 	"fmt"
+	"io/ioutil"
+	"log"
 	"os"
 	"path/filepath"
 
@@ -25,6 +27,7 @@ func main() {
 	if len(os.Args) != 2 {
 		fatal("Program takes a single argument")
 	}
+	log.SetOutput(ioutil.Discard)
 
 	filename := os.Args[1]
 
@@ -50,9 +53,7 @@ func main() {
 		fmt.Println("No changes")
 	case diff.ChangesPresentDiff:
 		fmt.Printf("%d changes found:\n", len(d.Deltas()))
-		for _, d := range d.Deltas() {
-			fmt.Printf("%#v\n", d)
-		}
+		fmt.Println(d.Pretty())
 	}
 
 }

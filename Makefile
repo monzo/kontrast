@@ -1,3 +1,4 @@
+.PHONY: all clean test build
 
 clean:
 	rm -f bin/

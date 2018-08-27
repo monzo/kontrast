@@ -52,10 +52,10 @@ func jsonDiffToDeltas(keyPrefix string, deltas []Delta, jsonDeltas []gojsondiff.
 			deltas = append(deltas, Delta{source, server})
 		case *gojsondiff.Object:
 			obj := d.(*gojsondiff.Object)
-			deltas = jsonDiffToDeltas(obj.Position.String()+".", deltas, obj.Deltas)
+			deltas = jsonDiffToDeltas(keyPrefix+obj.Position.String()+".", deltas, obj.Deltas)
 		case *gojsondiff.Array:
 			arr := d.(*gojsondiff.Array)
-			deltas = jsonDiffToDeltas(arr.Position.String()+".", deltas, arr.Deltas)
+			deltas = jsonDiffToDeltas(keyPrefix+arr.Position.String()+".", deltas, arr.Deltas)
 		default:
 			fmt.Printf("Unknown type %T: %+v\n", d, d)
 		}

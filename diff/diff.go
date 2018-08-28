@@ -3,7 +3,7 @@ package diff
 import (
 	"log"
 
-	"github.com/milesbxf/petrel/k8s"
+	"github.com/milesbxf/kryp/k8s"
 
 	_ "k8s.io/kubernetes/pkg/master"
 )

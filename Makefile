@@ -6,4 +6,4 @@ clean:
 build:
 	# mkdir -p bin/
 	# dep ensure -v
-	go build -o bin/petrel .
+	go build -o bin/kryp .

@@ -8,8 +8,8 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/milesbxf/petrel/diff"
-	"github.com/milesbxf/petrel/k8s"
+	"github.com/milesbxf/kryp/diff"
+	"github.com/milesbxf/kryp/k8s"
 )
 
 var (

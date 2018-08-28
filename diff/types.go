@@ -1,6 +1,6 @@
 package diff
 
-import "github.com/milesbxf/petrel/k8s"
+import "github.com/milesbxf/kryp/k8s"
 
 type Item struct {
 	Key   string

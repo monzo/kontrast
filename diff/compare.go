@@ -50,6 +50,17 @@ func jsonDiffToDeltas(keyPrefix string, deltas []Delta, jsonDeltas []gojsondiff.
 				Value: md.NewValue,
 			}
 			deltas = append(deltas, Delta{source, server})
+		case *gojsondiff.TextDiff:
+			md := d.(*gojsondiff.TextDiff)
+			source := Item{
+				Key:   keyPrefix + md.Position.String(),
+				Value: md.OldValue,
+			}
+			server := Item{
+				Key:   keyPrefix + md.Position.String(),
+				Value: md.NewValue,
+			}
+			deltas = append(deltas, Delta{source, server})
 		case *gojsondiff.Object:
 			obj := d.(*gojsondiff.Object)
 			deltas = jsonDiffToDeltas(keyPrefix+obj.Position.String()+".", deltas, obj.Deltas)

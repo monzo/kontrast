@@ -15,7 +15,10 @@ var serverRes = []*regexp.Regexp{
 
 func shouldKeepMetadata(d Delta) bool {
 	switch d.SourceItem.Key {
-	case "apiVersion", "kind", "metadata.namespace":
+	case "apiVersion",
+		"kind",
+		"metadata.creationTimestamp",
+		"metadata.namespace":
 		return false
 	}
 	for _, re := range sourceRes {
@@ -26,6 +29,10 @@ func shouldKeepMetadata(d Delta) bool {
 	switch d.ServerItem.Key {
 	case "metadata.generation",
 		"metadata.selfLink",
+		"metadata.resourceVersion",
+		"metadata.uid",
+		"spec.clusterIP",
+		"secrets",
 		"spec.template.spec.serviceAccount":
 		return false
 	case "metadata.annotations":

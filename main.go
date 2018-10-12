@@ -3,6 +3,8 @@ package main
 import (
 	"flag"
 	"fmt"
+	"io/ioutil"
+	"log"
 	"os"
 	"path/filepath"
 	"strings"
@@ -26,7 +28,7 @@ func main() {
 	if len(os.Args) != 2 {
 		fatal("Program takes a single argument")
 	}
-	// log.SetOutput(ioutil.Discard)
+	log.SetOutput(ioutil.Discard)
 
 	filename := os.Args[1]
 

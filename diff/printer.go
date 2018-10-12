@@ -2,6 +2,7 @@ package diff
 
 import (
 	"fmt"
+	"log"
 	"os"
 
 	"golang.org/x/crypto/ssh/terminal"
@@ -26,7 +27,8 @@ func (d ChangesPresentDiff) Pretty() string {
 
 	terminalWidth, _, err := terminal.GetSize(int(os.Stdin.Fd()))
 	if err != nil {
-		panic("Couldn't get terminal size: " + err.Error())
+		log.Println("Couldn't get terminal size: " + err.Error())
+		terminalWidth = 120
 	}
 
 	for _, delta := range d.Deltas() {

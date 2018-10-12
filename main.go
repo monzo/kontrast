@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/milesbxf/kryp/diff"
 	"github.com/milesbxf/kryp/k8s"
@@ -49,6 +50,11 @@ func main() {
 		}
 		if fi.IsDir() {
 			return nil // not a file.  ignore.
+		}
+
+		if !strings.HasSuffix(fi.Name(), ".yaml") {
+			fmt.Printf("Ignoring %s as it doesn't end in .yaml\n", fp)
+			return nil
 		}
 
 		fmt.Printf("Checking manifests in %s...\n", fp)

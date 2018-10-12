@@ -162,7 +162,7 @@ func (rh *ResourceHelper) Get(r *Resource) (runtime.Object, error) {
 			}
 			res := req.Do()
 			if res.Error() != nil {
-				fmt.Printf("do error: %#v", res.Error())
+				fmt.Printf("do error:\n%#v\nURL:%s", res.Error(), req.URL().String())
 				return &v1.List{}, res.Error()
 			}
 			obj, err := res.Get()
@@ -171,7 +171,7 @@ func (rh *ResourceHelper) Get(r *Resource) (runtime.Object, error) {
 			}
 			return obj, err
 		} else {
-			fmt.Printf("do error: %#v", res.Error())
+			fmt.Printf("do error:\n%#v\nURL:%s", res.Error(), req.URL().String())
 			return &v1.List{}, res.Error()
 		}
 	}

@@ -49,11 +49,14 @@ func main() {
 	switch d.(type) {
 	case diff.NotPresentOnServerDiff:
 		fmt.Println("Not found")
+		os.Exit(2)
 	case diff.EmptyDiff:
 		fmt.Println("No changes")
+		os.Exit(0)
 	case diff.ChangesPresentDiff:
 		fmt.Printf("%d changes found:\n", len(d.Deltas()))
 		fmt.Println(d.Pretty())
+		os.Exit(2)
 	}
 
 }

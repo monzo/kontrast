@@ -89,6 +89,11 @@ func (rh *ResourceHelper) mapping(gvk schema.GroupVersionKind) (*meta.RESTMappin
 func (rh *ResourceHelper) clientFor(gvk schema.GroupVersionKind) (rest.Interface, error) {
 	config := *rh.Config
 	gv := gvk.GroupVersion()
+	if gv.String() == "v1" {
+		config.APIPath = "/api"
+	} else {
+		config.APIPath = "/apis"
+	}
 	config.GroupVersion = &gv
 	return rest.RESTClientFor(&config)
 }

@@ -24,7 +24,6 @@ func LoadConfig(kubeconfigFilename string) (*rest.Config, error) {
 	}
 
 	config.NegotiatedSerializer = serializer.DirectCodecFactory{CodecFactory: scheme.Codecs}
-	config.APIPath = "/apis"
 
 	return config, nil
 }

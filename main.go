@@ -40,22 +40,38 @@ func main() {
 	if err != nil {
 		fatal("error: %f", err)
 	}
+	changesPresent := false
 
-	d, err := diff.GetFileDiff(filename, helper)
-	if err != nil {
-		fatal("error: %f", err)
-	}
+	filepath.Walk(filename, func(fp string, fi os.FileInfo, err error) error {
+		if err != nil {
+			fmt.Println(err) // can't walk here,
+			return nil       // but continue walking elsewhere
+		}
+		if fi.IsDir() {
+			return nil // not a file.  ignore.
+		}
 
-	switch d.(type) {
-	case diff.NotPresentOnServerDiff:
-		fmt.Println("Not found")
-		os.Exit(2)
-	case diff.EmptyDiff:
-		fmt.Println("No changes")
-		os.Exit(0)
-	case diff.ChangesPresentDiff:
-		fmt.Printf("%d changes found:\n", len(d.Deltas()))
-		fmt.Println(d.Pretty())
+		fmt.Printf("Checking manifests in %s...\n", fp)
+		d, err := diff.GetFileDiff(fp, helper)
+		if err != nil {
+			fatal("error: %f", err)
+		}
+
+		switch d.(type) {
+		case diff.NotPresentOnServerDiff:
+			fmt.Println("Not found")
+			changesPresent = true
+		case diff.EmptyDiff:
+			fmt.Println("No changes")
+		case diff.ChangesPresentDiff:
+			fmt.Printf("%d changes found:\n", len(d.Deltas()))
+			fmt.Println(d.Pretty())
+			changesPresent = true
+		}
+		return nil
+	})
+
+	if changesPresent {
 		os.Exit(2)
 	}
 

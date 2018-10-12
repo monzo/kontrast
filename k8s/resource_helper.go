@@ -133,10 +133,13 @@ func (rh *ResourceHelper) Get(r *Resource) (runtime.Object, error) {
 		return &v1.List{}, fmt.Errorf("creating REST client: %s", err.Error())
 	}
 	req := client.Get().
-		Namespace(r.Namespace).
 		Resource(mappedResource.Resource.Resource).
 		Param("export", "true").
 		Name(r.Name)
+
+	if mappedResource.Scope.Name() == "namespace" {
+		req.Namespace(r.Namespace)
+	}
 
 	res := req.Do()
 

@@ -1,14 +1,16 @@
 package k8s
 
 import (
+	"bufio"
 	"fmt"
-	"io/ioutil"
 	"log"
+	"os"
 	"strings"
 
 	"k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/api/meta"
+	"k8s.io/apimachinery/pkg/util/yaml"
 
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -51,12 +53,30 @@ func NewResourceHelper(config *rest.Config, defaultNamespace string) (*ResourceH
 	}, nil
 }
 
-func (rh *ResourceHelper) NewResourceFromFilename(filename string) (*Resource, error) {
-	bytes, err := ioutil.ReadFile(filename)
+func (rh *ResourceHelper) NewResourcesFromFilename(filename string) ([]*Resource, error) {
+	f, err := os.Open(filename)
 	if err != nil {
-		return &Resource{}, fmt.Errorf("read file %s: %s", filename, err.Error())
+		return []*Resource{}, fmt.Errorf("open file %s: %s", filename, err.Error())
 	}
-	return rh.NewResourceFromBytes(bytes)
+	resources := []*Resource{}
+
+	reader := bufio.NewReader(f)
+	decoder := yaml.NewYAMLReader(reader)
+
+	for {
+		bytes, err := decoder.Read()
+		if len(bytes) == 0 {
+			return resources, nil
+		}
+		if err != nil {
+			return []*Resource{}, fmt.Errorf("decode doc from %s: %s", filename, err.Error())
+		}
+		res, err := rh.NewResourceFromBytes(bytes)
+		if err != nil {
+			return []*Resource{}, fmt.Errorf("deserialise resource %s: %s", filename, err.Error())
+		}
+		resources = append(resources, res)
+	}
 }
 
 func (rh *ResourceHelper) NewResourceFromBytes(bytes []byte) (*Resource, error) {

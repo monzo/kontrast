@@ -58,21 +58,23 @@ func main() {
 		}
 
 		fmt.Printf("Checking manifests in %s...\n", fp)
-		d, err := diff.GetFileDiff(fp, helper)
+		diffs, err := diff.GetFileDiff(fp, helper)
 		if err != nil {
 			fatal("error: %f", err)
 		}
+		for _, d := range diffs {
 
-		switch d.(type) {
-		case diff.NotPresentOnServerDiff:
-			fmt.Println("Not found")
-			changesPresent = true
-		case diff.EmptyDiff:
-			fmt.Println("No changes")
-		case diff.ChangesPresentDiff:
-			fmt.Printf("%d changes found:\n", len(d.Deltas()))
-			fmt.Println(d.Pretty())
-			changesPresent = true
+			switch d.(type) {
+			case diff.NotPresentOnServerDiff:
+				fmt.Println("Not found")
+				changesPresent = true
+			case diff.EmptyDiff:
+				fmt.Println("No changes")
+			case diff.ChangesPresentDiff:
+				fmt.Printf("%d changes found:\n", len(d.Deltas()))
+				fmt.Println(d.Pretty())
+				changesPresent = true
+			}
 		}
 		return nil
 	})

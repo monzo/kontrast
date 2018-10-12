@@ -8,12 +8,23 @@ import (
 	_ "k8s.io/kubernetes/pkg/master"
 )
 
-func GetFileDiff(filename string, helper *k8s.ResourceHelper) (Diff, error) {
-	resource, err := helper.NewResourceFromFilename(filename)
+func GetFileDiff(filename string, helper *k8s.ResourceHelper) ([]Diff, error) {
+	resources, err := helper.NewResourcesFromFilename(filename)
 	if err != nil {
 		log.Printf("Error getting resource: %v", err)
-		return EmptyDiff{}, err
+		return []Diff{EmptyDiff{}}, err
 	}
+	diffs := []Diff{}
+	for _, r := range resources {
+		d, err := processResource(r, helper)
+		if err != nil {
+			return diffs, err
+		}
+		diffs = append(diffs, d)
+	}
+	return diffs, nil
+}
+func processResource(resource *k8s.Resource, helper *k8s.ResourceHelper) (Diff, error) {
 	log.Printf("Setting defaults for object %v", resource.Object)
 	defaultedObj := k8s.GetWithDefaults(resource.Object)
 	meta := DiffMeta{Resource: resource}

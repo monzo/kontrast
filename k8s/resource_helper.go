@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"strings"
 
 	"k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -122,31 +123,63 @@ func (rh *ResourceHelper) Create(r *Resource) error {
 	return nil
 }
 
-func (rh *ResourceHelper) Get(r *Resource) (runtime.Object, error) {
+func (rh *ResourceHelper) buildRequestFor(r *Resource, export bool) (*rest.Request, error) {
 	gvk := r.Object.GetObjectKind().GroupVersionKind()
 	mappedResource, err := rh.mapping(gvk)
 	if err != nil {
-		return &v1.List{}, fmt.Errorf("getting RESTMapping: %s", err.Error())
+		return &rest.Request{}, fmt.Errorf("getting RESTMapping: %s", err.Error())
 	}
 	client, err := rh.clientFor(gvk)
 	if err != nil {
-		return &v1.List{}, fmt.Errorf("creating REST client: %s", err.Error())
+		return &rest.Request{}, fmt.Errorf("creating REST client: %s", err.Error())
 	}
 	req := client.Get().
 		Resource(mappedResource.Resource.Resource).
-		Param("export", "true").
 		Name(r.Name)
 
+	if export {
+		req.Param("export", "true")
+	}
 	if mappedResource.Scope.Name() == "namespace" {
 		req.Namespace(r.Namespace)
 	}
+	return req, nil
+}
 
+func (rh *ResourceHelper) Get(r *Resource) (runtime.Object, error) {
+	req, err := rh.buildRequestFor(r, true)
+	if err != nil {
+		return &v1.List{}, err
+	}
 	res := req.Do()
 
 	if res.Error() != nil {
-		return &v1.List{}, res.Error()
+		if strings.HasPrefix(res.Error().Error(), "export of") {
+			fmt.Println("retrying with export disabled")
+			req, err := rh.buildRequestFor(r, false)
+			if err != nil {
+				return &v1.List{}, err
+			}
+			res := req.Do()
+			if res.Error() != nil {
+				fmt.Printf("do error: %#v", res.Error())
+				return &v1.List{}, res.Error()
+			}
+			obj, err := res.Get()
+			if err != nil {
+				fmt.Printf("get error: %#v", res.Error())
+			}
+			return obj, err
+		} else {
+			fmt.Printf("do error: %#v", res.Error())
+			return &v1.List{}, res.Error()
+		}
 	}
-	return res.Get()
+	obj, err := res.Get()
+	if err != nil {
+		fmt.Printf("get error: %#v", res.Error())
+	}
+	return obj, err
 }
 
 func (rh *ResourceHelper) Delete(r *Resource) error {

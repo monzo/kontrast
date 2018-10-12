@@ -31,7 +31,12 @@ func GetFileDiff(filename string, helper *k8s.ResourceHelper) (Diff, error) {
 	if len(deltas) == 0 {
 		return EmptyDiff{DiffMeta: meta}, nil
 	}
-	return ChangesPresentDiff{DiffMeta: meta, deltas: deltas}, nil
+
+	filtered := deltas
+	for _, f := range []DeltaFilter{MetadataFilter} {
+		filtered = f(filtered)
+	}
+	return ChangesPresentDiff{DiffMeta: meta, deltas: filtered}, nil
 }
 
 var empty = struct{}{}

@@ -20,6 +20,8 @@ import (
 	"k8s.io/client-go/restmapper"
 )
 
+// ResourceHelper manages getting, updating, creating/deleting K8s objects with
+// a remote API server
 type ResourceHelper struct {
 	Config *rest.Config
 	meta.RESTMapper
@@ -37,6 +39,9 @@ func NewResourceHelper(config *rest.Config, defaultNamespace string) (*ResourceH
 		return &ResourceHelper{}, fmt.Errorf("create REST client: %s", err.Error())
 	}
 
+	// heavily borrowed from kubectl code; discovers available API groups and
+	// creates a mapping between resources and REST mappings (e.g. apps/v1beta2
+	// Deployment => /apis/apps/v1beta2/namespaces/<namespace>/deployments)
 	discoveryClient := discovery.NewDiscoveryClient(client)
 	apiGroupResources, err := restmapper.GetAPIGroupResources(discoveryClient)
 	if err != nil {
@@ -53,6 +58,10 @@ func NewResourceHelper(config *rest.Config, defaultNamespace string) (*ResourceH
 	}, nil
 }
 
+// NewResourcesFromFilename creates Resource wrappers for each manifest found
+// in the filename passed in.
+// TODO: this struct shouldn't be responsible for files or YAML parsing, we
+// should just pass in an object's worth of bytes
 func (rh *ResourceHelper) NewResourcesFromFilename(filename string) ([]*Resource, error) {
 	f, err := os.Open(filename)
 	if err != nil {
@@ -61,29 +70,43 @@ func (rh *ResourceHelper) NewResourcesFromFilename(filename string) ([]*Resource
 	resources := []*Resource{}
 
 	reader := bufio.NewReader(f)
+	// use K8s YAML reader to split up documents (1 doc should == 1 object)
 	decoder := yaml.NewYAMLReader(reader)
 
 	for {
 		bytes, err := decoder.Read()
-		if len(bytes) == 0 {
-			return resources, nil
-		}
+
 		if err != nil {
 			return []*Resource{}, fmt.Errorf("decode doc from %s: %s", filename, err.Error())
 		}
+
+		if len(bytes) == 0 {
+			// no more documents
+			return resources, nil
+		}
+
 		res, err := rh.NewResourceFromBytes(bytes)
 		if err != nil {
 			return []*Resource{}, fmt.Errorf("deserialise resource %s: %s", filename, err.Error())
 		}
+
 		resources = append(resources, res)
 	}
 }
 
+// NewResourceFromBytes creates a new Resource wrapper from the passed in
+// bytes. Nothing is done with the remote K8s API server until Resource
+// methods are called.
 func (rh *ResourceHelper) NewResourceFromBytes(bytes []byte) (*Resource, error) {
+
+	// K8s deserialiser does all the hard work for us here - figures out
+	// format, API group, kind, version
 	obj, _, err := scheme.Codecs.UniversalDeserializer().Decode(bytes, nil, nil)
+
 	if err != nil {
 		return &Resource{}, fmt.Errorf("parse resource from bytes: %s", err.Error())
 	}
+
 	return rh.NewResource(obj)
 }
 
@@ -103,32 +126,45 @@ func (rh *ResourceHelper) NewResource(obj runtime.Object) (*Resource, error) {
 	}, nil
 }
 
+// mapping gets the RESTMapping for this particular object so that the REST
+// client can build a URL for this resource - e.g.  apps/v1beta2 Deployment
+// => /apis/apps/v1beta2/namespaces/<namespace>/deployments
 func (rh *ResourceHelper) mapping(gvk schema.GroupVersionKind) (*meta.RESTMapping, error) {
 	return rh.RESTMapper.RESTMapping(gvk.GroupKind(), gvk.GroupVersion().Version)
 }
 
 func (rh *ResourceHelper) clientFor(gvk schema.GroupVersionKind) (rest.Interface, error) {
+
 	config := *rh.Config
 	gv := gvk.GroupVersion()
+	config.GroupVersion = &gv
+
+	// This is crufty :( K8s serves it's "legacy"/"core" API (anything under
+	// the v1 prefix) at /api, and all the regular API groups at /apis
+	// It makes me feel better that there is a similar piece of code somewhere
+	// in the kubectl codebase
 	if gv.String() == "v1" {
 		config.APIPath = "/api"
 	} else {
 		config.APIPath = "/apis"
 	}
-	config.GroupVersion = &gv
+
 	return rest.RESTClientFor(&config)
 }
 
 func (rh *ResourceHelper) Create(r *Resource) error {
 	gvk := r.Object.GetObjectKind().GroupVersionKind()
+
 	mappedResource, err := rh.mapping(gvk)
 	if err != nil {
 		return fmt.Errorf("getting RESTMapping: %s", err.Error())
 	}
+
 	client, err := rh.clientFor(gvk)
 	if err != nil {
 		return fmt.Errorf("creating REST client: %s", err.Error())
 	}
+
 	req := client.Post().
 		Namespace(r.Namespace).
 		Resource(mappedResource.Resource.Resource).
@@ -143,16 +179,19 @@ func (rh *ResourceHelper) Create(r *Resource) error {
 	return nil
 }
 
-func (rh *ResourceHelper) buildRequestFor(r *Resource, export bool) (*rest.Request, error) {
+func (rh *ResourceHelper) buildGETRequestFor(r *Resource, export bool) (*rest.Request, error) {
 	gvk := r.Object.GetObjectKind().GroupVersionKind()
+
 	mappedResource, err := rh.mapping(gvk)
 	if err != nil {
 		return &rest.Request{}, fmt.Errorf("getting RESTMapping: %s", err.Error())
 	}
+
 	client, err := rh.clientFor(gvk)
 	if err != nil {
 		return &rest.Request{}, fmt.Errorf("creating REST client: %s", err.Error())
 	}
+
 	req := client.Get().
 		Resource(mappedResource.Resource.Resource).
 		Name(r.Name)
@@ -160,14 +199,16 @@ func (rh *ResourceHelper) buildRequestFor(r *Resource, export bool) (*rest.Reque
 	if export {
 		req.Param("export", "true")
 	}
+
 	if mappedResource.Scope.Name() == "namespace" {
 		req.Namespace(r.Namespace)
 	}
+
 	return req, nil
 }
 
 func (rh *ResourceHelper) Get(r *Resource) (runtime.Object, error) {
-	req, err := rh.buildRequestFor(r, true)
+	req, err := rh.buildGETRequestFor(r, true)
 	if err != nil {
 		return &v1.List{}, err
 	}
@@ -176,7 +217,7 @@ func (rh *ResourceHelper) Get(r *Resource) (runtime.Object, error) {
 	if res.Error() != nil {
 		if strings.HasPrefix(res.Error().Error(), "export of") {
 			fmt.Println("retrying with export disabled")
-			req, err := rh.buildRequestFor(r, false)
+			req, err := rh.buildGETRequestFor(r, false)
 			if err != nil {
 				return &v1.List{}, err
 			}

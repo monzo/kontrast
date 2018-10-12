@@ -10,7 +10,7 @@ import (
 	"strings"
 
 	"github.com/milesbxf/kryp/diff"
-	"github.com/milesbxf/kryp/k8s"
+	"github.com/milesbxf/kryp/pkg/k8s"
 )
 
 var (

@@ -20,26 +20,22 @@ func GetDiffsForResource(resource *k8s.Resource, helper *k8s.ResourceHelper) (Di
 	deltas, err := calculateDiff(defaultedObj, serverObj)
 	if err != nil {
 		log.Printf("Error calculating deltas: %v", err)
-		return EmptyDiff{}, err
-	}
-	log.Printf("Found %d deltas", len(deltas))
-	if len(deltas) == 0 {
-		return EmptyDiff{DiffMeta: meta}, nil
+		return ChangesPresentDiff{}, err
 	}
 
 	filtered := deltas
 	for _, f := range []DeltaFilter{MetadataFilter} {
 		filtered = f(filtered)
 	}
+
+	log.Printf("Found %d deltas", len(deltas))
+
 	return ChangesPresentDiff{DiffMeta: meta, deltas: filtered}, nil
 }
 
 var empty = struct{}{}
 
-func (d EmptyDiff) Pretty() string   { return "" }
-func (ed EmptyDiff) Deltas() []Delta { return []Delta{} }
-
 func (d ChangesPresentDiff) Deltas() []Delta { return d.deltas }
 
-func (d NotPresentOnServerDiff) Pretty() string  { return "" }
-func (d NotPresentOnServerDiff) Deltas() []Delta { return []Delta{} }
+func (d NotPresentOnServerDiff) Pretty(colorEnabled bool) string { return "" }
+func (d NotPresentOnServerDiff) Deltas() []Delta                 { return []Delta{} }

@@ -14,15 +14,11 @@ type Delta struct {
 
 type Diff interface {
 	Deltas() []Delta
-	Pretty() string
+	Pretty(colorEnabled bool) string
 }
 
 type DiffMeta struct {
 	Resource *k8s.Resource
-}
-
-type EmptyDiff struct {
-	DiffMeta
 }
 
 type ChangesPresentDiff struct {

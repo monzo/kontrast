@@ -14,7 +14,8 @@ import (
 )
 
 var (
-	kubeconfig *string
+	kubeconfig   *string
+	colorEnabled *bool
 )
 
 func main() {
@@ -23,6 +24,7 @@ func main() {
 	} else {
 		kubeconfig = flag.String("kubeconfig", "", "absolute path to the kubeconfig file")
 	}
+	colorEnabled = flag.Bool("no-color", false, "Disables ANSI colour output")
 	flag.Parse()
 
 	if len(os.Args) != 2 {
@@ -64,24 +66,26 @@ func main() {
 		}
 
 		for _, r := range resources {
-			kind := r.Object.GetObjectKind().GroupVersionKind().Kind
-			fmt.Printf("%s %s/%s - [%s]\n", kind, r.Namespace, r.Name, fp)
 			d, err := diff.GetDiffsForResource(r, helper)
 			if err != nil {
 				fmt.Printf("Error getting resource: %v\n", err)
 				return nil
 			}
 
+			var status string
 			switch d.(type) {
 			case diff.NotPresentOnServerDiff:
-				fmt.Println("Not found")
+				status = "not found on server"
 				changesPresent = true
-			case diff.EmptyDiff:
-				fmt.Println("No changes")
 			case diff.ChangesPresentDiff:
-				fmt.Printf("%d changes found:\n", len(d.Deltas()))
-				fmt.Println(d.Pretty())
-				changesPresent = true
+				status = fmt.Sprintf("%d changes", len(d.Deltas()))
+				changesPresent = len(d.Deltas()) > 0
+			}
+			kind := r.Object.GetObjectKind().GroupVersionKind().Kind
+			ref := fmt.Sprintf("%s/%s", r.Namespace, r.Name)
+			fmt.Printf("%-50s %-25s %-50s: %s\n", ref, kind, fp, status)
+			if changesPresent {
+				fmt.Println(d.Pretty(*colorEnabled))
 			}
 		}
 		return nil

@@ -22,7 +22,7 @@ func (i Item) Pretty() string {
 	return fmt.Sprintf("%s: %v", i.Key, i.Value)
 }
 
-func (d ChangesPresentDiff) Pretty() string {
+func (d ChangesPresentDiff) Pretty(colorEnabled bool) string {
 	var maxLeft, maxRight int
 
 	terminalWidth, _, err := terminal.GetSize(int(os.Stdin.Fd()))
@@ -46,17 +46,20 @@ func (d ChangesPresentDiff) Pretty() string {
 	prettyStr := ""
 	for _, delta := range d.Deltas() {
 		prettyStr += fmt.Sprintf(
-			"%s %-*s | %-*s%s\n",
-			delta.getPrettyLineStart(),
+			"%s %-*s | %-*s",
+			delta.getPrettyLineStart(colorEnabled),
 			maxLeft, delta.SourceItem.Pretty(),
 			maxRight, delta.ServerItem.Pretty(),
-			reset,
 		)
 	}
+	if colorEnabled {
+		prettyStr += reset
+	}
+	prettyStr += "/n"
 	return prettyStr
 }
 
-func (d Delta) getPrettyLineStart() string {
+func (d Delta) getPrettyLineStart(colorEnabled bool) string {
 	gutterChar := ""
 	lineColor := ""
 	if (d.SourceItem != Item{} && d.ServerItem == Item{}) {
@@ -68,6 +71,9 @@ func (d Delta) getPrettyLineStart() string {
 	} else if (d.SourceItem == Item{} && d.ServerItem != Item{}) {
 		gutterChar = "-"
 		lineColor = red
+	}
+	if !colorEnabled {
+		lineColor = ""
 	}
 	return fmt.Sprintf("%s%s", lineColor, gutterChar)
 }

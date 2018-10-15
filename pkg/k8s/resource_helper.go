@@ -216,7 +216,7 @@ func (rh *ResourceHelper) Get(r *Resource) (runtime.Object, error) {
 
 	if res.Error() != nil {
 		if strings.HasPrefix(res.Error().Error(), "export of") {
-			fmt.Println("retrying with export disabled")
+			log.Println("retrying with export disabled")
 			req, err := rh.buildGETRequestFor(r, false)
 			if err != nil {
 				return &v1.List{}, err

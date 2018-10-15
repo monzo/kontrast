@@ -57,12 +57,20 @@ func main() {
 			return nil
 		}
 
-		fmt.Printf("Checking manifests in %s...\n", fp)
-		diffs, err := diff.GetFileDiff(fp, helper)
+		resources, err := helper.NewResourcesFromFilename(fp)
 		if err != nil {
-			fatal("error: %f", err)
+			fmt.Printf("Error getting resource: %v\n", err)
+			return nil
 		}
-		for _, d := range diffs {
+
+		for _, r := range resources {
+			kind := r.Object.GetObjectKind().GroupVersionKind().Kind
+			fmt.Printf("%s %s/%s - [%s]\n", kind, r.Namespace, r.Name, fp)
+			d, err := diff.GetDiffsForResource(r, helper)
+			if err != nil {
+				fmt.Printf("Error getting resource: %v\n", err)
+				return nil
+			}
 
 			switch d.(type) {
 			case diff.NotPresentOnServerDiff:

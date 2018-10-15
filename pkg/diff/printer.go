@@ -55,7 +55,6 @@ func (d ChangesPresentDiff) Pretty(colorEnabled bool) string {
 	if colorEnabled {
 		prettyStr += reset
 	}
-	prettyStr += "/n"
 	return prettyStr
 }
 

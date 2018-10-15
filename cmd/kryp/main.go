@@ -15,7 +15,7 @@ import (
 
 var (
 	kubeconfig   *string
-	colorEnabled *bool
+	colorEnabled bool
 )
 
 func main() {
@@ -24,15 +24,19 @@ func main() {
 	} else {
 		kubeconfig = flag.String("kubeconfig", "", "absolute path to the kubeconfig file")
 	}
-	colorEnabled = flag.Bool("no-color", false, "Disables ANSI colour output")
+	colorDisabled := flag.Bool("no-color", false, "Disables ANSI colour output")
 	flag.Parse()
+	args := flag.Args()
 
-	if len(os.Args) != 2 {
-		fatal("Program takes a single argument")
+	colorEnabled = !*colorDisabled
+
+	if len(args) != 1 {
+		flag.Usage()
+		fatal("Error: requires positional argument for directory/file to check")
 	}
 	log.SetOutput(ioutil.Discard)
 
-	filename := os.Args[1]
+	filename := args[0]
 
 	config, err := k8s.LoadConfig(*kubeconfig)
 	if err != nil {
@@ -85,7 +89,7 @@ func main() {
 			ref := fmt.Sprintf("%s/%s", r.Namespace, r.Name)
 			fmt.Printf("%-50s %-25s %-50s: %s\n", ref, kind, fp, status)
 			if changesPresent {
-				fmt.Println(d.Pretty(*colorEnabled))
+				fmt.Println(d.Pretty(colorEnabled))
 			}
 		}
 		return nil

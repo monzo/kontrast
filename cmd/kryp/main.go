@@ -83,7 +83,9 @@ func main() {
 				changesPresent = true
 			case diff.ChangesPresentDiff:
 				status = fmt.Sprintf("%d changes", len(d.Deltas()))
-				changesPresent = len(d.Deltas()) > 0
+				if len(d.Deltas()) > 0 {
+					changesPresent = true
+				}
 			}
 			kind := r.Object.GetObjectKind().GroupVersionKind().Kind
 			ref := fmt.Sprintf("%s/%s", r.Namespace, r.Name)

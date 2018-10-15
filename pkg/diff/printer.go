@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 
+	"github.com/sergi/go-diff/diffmatchpatch"
 	"golang.org/x/crypto/ssh/terminal"
 )
 
@@ -45,17 +47,37 @@ func (d ChangesPresentDiff) Pretty(colorEnabled bool) string {
 
 	prettyStr := ""
 	for _, delta := range d.Deltas() {
-		prettyStr += fmt.Sprintf(
-			"%s %-*s | %-*s",
-			delta.getPrettyLineStart(colorEnabled),
-			maxLeft, delta.SourceItem.Pretty(),
-			maxRight, delta.ServerItem.Pretty(),
-		)
+		sourceVal := strOrRepr(delta.SourceItem.Value)
+		serverVal := strOrRepr(delta.ServerItem.Value)
+		if multilineString(sourceVal) || multilineString(serverVal) {
+			dmp := diffmatchpatch.New()
+			diffs := dmp.DiffMain(sourceVal, serverVal, false)
+			prettyStr += dmp.DiffPrettyText(diffs)
+		} else {
+			prettyStr += fmt.Sprintf(
+				"%s %-*s | %-*s",
+				delta.getPrettyLineStart(colorEnabled),
+				maxLeft, delta.SourceItem.Pretty(),
+				maxRight, delta.ServerItem.Pretty(),
+			)
+		}
 	}
 	if colorEnabled {
 		prettyStr += reset
 	}
 	return prettyStr
+}
+
+func strOrRepr(v interface{}) string {
+	s, ok := v.(string)
+	if !ok {
+		return fmt.Sprintf("%v", v)
+	}
+	return s
+}
+
+func multilineString(s string) bool {
+	return strings.Index(s, "\n") != -1
 }
 
 func (d Delta) getPrettyLineStart(colorEnabled bool) string {

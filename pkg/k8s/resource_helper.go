@@ -223,22 +223,22 @@ func (rh *ResourceHelper) Get(r *Resource) (runtime.Object, error) {
 			}
 			res := req.Do()
 			if res.Error() != nil {
-				fmt.Printf("do error:\n%#v\nURL:%s\n", res.Error(), req.URL().String())
+				log.Printf("do error:\n%#v\nURL:%s", res.Error(), req.URL().String())
 				return &v1.List{}, res.Error()
 			}
 			obj, err := res.Get()
 			if err != nil {
-				fmt.Printf("get error: %#v\n", res.Error())
+				log.Printf("get error: %#v", res.Error())
 			}
 			return obj, err
 		} else {
-			fmt.Printf("do error:\n%#v\nURL:%s\n", res.Error(), req.URL().String())
+			log.Printf("do error:\n%#v\nURL:%s", res.Error(), req.URL().String())
 			return &v1.List{}, res.Error()
 		}
 	}
 	obj, err := res.Get()
 	if err != nil {
-		fmt.Printf("get error: %#v\n", res.Error())
+		log.Printf("get error: %#v", res.Error())
 	}
 	return obj, err
 }

@@ -76,13 +76,13 @@ func (rh *ResourceHelper) NewResourcesFromFilename(filename string) ([]*Resource
 	for {
 		bytes, err := decoder.Read()
 
-		if err != nil {
-			return []*Resource{}, fmt.Errorf("decode doc from %s: %s", filename, err.Error())
-		}
-
 		if len(bytes) == 0 {
 			// no more documents
 			return resources, nil
+		}
+
+		if err != nil {
+			return []*Resource{}, fmt.Errorf("decode doc from %s: %s", filename, err.Error())
 		}
 
 		res, err := rh.NewResourceFromBytes(bytes)

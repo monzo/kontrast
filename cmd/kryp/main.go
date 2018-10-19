@@ -9,8 +9,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/milesbxf/kryp/pkg/diff"
-	"github.com/milesbxf/kryp/pkg/k8s"
+	"github.com/monzo/kryp/pkg/diff"
+	"github.com/monzo/kryp/pkg/k8s"
 )
 
 var (

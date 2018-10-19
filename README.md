@@ -4,7 +4,7 @@
 
 ## Installation
 
-`go install github.com/milesbxf/kryp`
+`go install github.com/monzo/kryp`
 
 Note: this takes a while [1]
 

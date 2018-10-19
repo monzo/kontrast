@@ -8,6 +8,7 @@ type DeltaFilter func([]Delta) []Delta
 
 var sourceRes = []*regexp.Regexp{
 	regexp.MustCompile(`spec\.template\.spec\.volumes\.[0-9]+\.hostPath\.type`),
+	regexp.MustCompile(`spec\.selector\.matchLabels\..+`),
 }
 var serverRes = []*regexp.Regexp{
 	regexp.MustCompile(`spec\.template\.spec\.volumes\.[0-9]+\.emptyDir\.sizeLimit`),
@@ -17,6 +18,7 @@ func shouldKeepMetadata(d Delta) bool {
 	switch d.SourceItem.Key {
 	case "apiVersion",
 		"kind",
+		"status.phase",
 		"metadata.creationTimestamp",
 		"metadata.namespace":
 		return false
@@ -33,6 +35,7 @@ func shouldKeepMetadata(d Delta) bool {
 		"metadata.uid",
 		"spec.clusterIP",
 		"secrets",
+		"spec.volumeName",
 		"spec.template.spec.serviceAccount":
 		return false
 	case "metadata.annotations":

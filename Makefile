@@ -21,7 +21,7 @@ build-linux:
 	dep ensure -v
 	GOOS=linux go build -o bin/kryp ./cmd/kryp
 
-docker: build-linux
+docker:
 	docker build . -t $(DOCKER_IMAGE)
 
 docker-push: docker

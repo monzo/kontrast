@@ -17,6 +17,11 @@ func GetDiffsForResource(resource *k8s.Resource, helper *k8s.ResourceHelper) (Di
 	if k8s.IsNotFoundError(err) {
 		return NotPresentOnServerDiff{DiffMeta: meta}, nil
 	}
+	if err != nil {
+		log.Printf("Error getting object: %v", err)
+		return ChangesPresentDiff{}, err
+	}
+
 	deltas, err := calculateDiff(defaultedObj, serverObj)
 	if err != nil {
 		log.Printf("Error calculating deltas: %v", err)

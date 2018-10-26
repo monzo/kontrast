@@ -6,9 +6,9 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/cloudflare/cfssl/log"
 	humanize "github.com/dustin/go-humanize"
 	"github.com/sergi/go-diff/diffmatchpatch"
+	log "github.com/sirupsen/logrus"
 )
 
 var templateFiles = []string{"assets/templates/main.tmpl"}

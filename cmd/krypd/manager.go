@@ -7,10 +7,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/cloudflare/cfssl/log"
 	"github.com/monzo/kryp/pkg/diff"
 	"github.com/monzo/kryp/pkg/k8s"
 	"github.com/prometheus/client_golang/prometheus"
+	log "github.com/sirupsen/logrus"
 	"k8s.io/client-go/rest"
 )
 

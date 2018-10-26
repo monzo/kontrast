@@ -12,6 +12,9 @@ build:
 	dep ensure -v
 	go build -o bin/kryp ./cmd/kryp
 
+krypd:
+	go build -o bin/krypd ./cmd/krypd
+
 build-in-docker:
 	dep ensure -vendor-only -v
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o /out/kryp ./cmd/kryp

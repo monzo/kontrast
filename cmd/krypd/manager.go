@@ -10,6 +10,7 @@ import (
 	"github.com/cloudflare/cfssl/log"
 	"github.com/monzo/kryp/pkg/diff"
 	"github.com/monzo/kryp/pkg/k8s"
+	"github.com/prometheus/client_golang/prometheus"
 	"k8s.io/client-go/rest"
 )
 
@@ -18,6 +19,13 @@ type DiffManager struct {
 	LastErr error
 	*k8s.ResourceHelper
 }
+
+var (
+	currentDiffsGauge = prometheus.NewGauge(prometheus.GaugeOpts{
+		Name: "kryp_current_diffs",
+		Help: "Number of diffs between manifests and cluster",
+	})
+)
 
 func (dm *DiffManager) DiffRun(path string) (*DiffRun, error) {
 	d := &DiffRun{
@@ -45,6 +53,7 @@ func (dm *DiffManager) DiffRun(path string) (*DiffRun, error) {
 		d.Files = append(d.Files, f)
 		return nil
 	})
+	currentDiffsGauge.Set(float64(numDiffs))
 	d.DiffResult = DiffFromNumber(numDiffs)
 	dm.LastRun = d
 	dm.LastErr = err
@@ -125,6 +134,7 @@ func DiffFromDelta(delta diff.Delta) Diff {
 
 func NewDiffManager(config *rest.Config) (*DiffManager, error) {
 	helper, err := k8s.NewResourceHelperWithDefaults(config)
+	prometheus.MustRegister(currentDiffsGauge)
 	if err != nil {
 		return &DiffManager{}, err
 	}

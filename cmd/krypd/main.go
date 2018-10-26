@@ -52,7 +52,7 @@ func main() {
 		log.Fatalf("error: %f", err)
 	}
 
-	dm.DiffRun(filename)
+	go dm.DiffRun(filename)
 	updateTicker := time.NewTicker(intervalDuration)
 	go func() {
 		for range updateTicker.C {

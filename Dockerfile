@@ -16,3 +16,9 @@ COPY --from=builder /out/krypd /bin/krypd
 
 VOLUME /data
 
+WORKDIR /web
+
+ADD ./assets /web/assets
+
+CMD ["/bin/krypd"]
+

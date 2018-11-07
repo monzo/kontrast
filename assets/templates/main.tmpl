@@ -30,14 +30,21 @@
                             <span class="name">{{ .GroupVersionKind }}/{{ .Name}} [{{ .Namespace }}]</span>
                             <span class="diff-count">{{ diffResultToEmoji .DiffResult }}</span>
                         </div>
-                        {{ if .Diffs }}<div class="resource-diffs">
-                            {{ range .Diffs }}
-                                <div class="diff">
-                                    <div class="diff-key">{{ .Key }}</div>
-                                    <div class="diff-content">{{ renderDiffHTML . }}</div>
-                                </div>
-                            {{ end }}
-                        </div>{{ end }}
+                        {{ if .DiffResult.Error }}<div class="resource-diffs">
+                                    <div class="diff">
+                                        <div class="diff-key">Error</div>
+                                        <div class="diff-content">{{ .DiffResult.Error }}</div>
+                                    </div>
+                        </div>{{ else }}
+                            {{ if .Diffs }}<div class="resource-diffs">
+                                {{ range .Diffs }}
+                                    <div class="diff">
+                                        <div class="diff-key">{{ .Key }}</div>
+                                        <div class="diff-content">{{ renderDiffHTML . }}</div>
+                                    </div>
+                                {{ end }}
+                            </div>{{ end }}
+                        {{ end }}
                     </div>
                 {{ end }}
             </div>

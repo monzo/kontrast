@@ -8,11 +8,11 @@ type DeltaFilter func([]Delta) []Delta
 
 var sourceRes = []*regexp.Regexp{
 	regexp.MustCompile(`spec\.template\.spec\.volumes\.[0-9]+\.hostPath\.type`),
-	regexp.MustCompile(`spec\.selector\.matchLabels\..+`),
-	regexp.MustCompile(`spec\.ports\.[0-9]+\.nodePort`),
 }
 var serverRes = []*regexp.Regexp{
 	regexp.MustCompile(`spec\.template\.spec\.volumes\.[0-9]+\.emptyDir\.sizeLimit`),
+	regexp.MustCompile(`spec\.ports\.[0-9]+\.nodePort`),
+	regexp.MustCompile(`status.*`),
 }
 
 func shouldKeepMetadata(d Delta) bool {

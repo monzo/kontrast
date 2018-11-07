@@ -101,6 +101,10 @@ div {
 }
 
 .status-clean {
+    background-color: #e4e3e3;
+}
+
+.status-new {
     background-color: #ccffcd;
 }
 

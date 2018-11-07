@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+
+  <title>Kryp [{{ .DiffResult.NumDiffs }} diffs]</title>
+
+  <link rel="stylesheet" href="static/main.css">
+  <!-- <script src="js/scripts.js"></script> -->
+
+</head>
+
+<body>
+    <div class="nav status-{{ .DiffResult.Status }}">
+        <span class="nav-cell header">Kryp</span>
+        <span class="nav-cell">{{ .DiffResult.NumDiffs }} diffs</span>
+        <span class="nav-cell nav-cell-right generated-time">generated {{ humanizeTime .Time }}</span>
+    </div>
+
+    <div class="file-table">
+        {{ range .Files }}
+            <div class="file">
+                <div class="file-header status-{{ .DiffResult.Status }}">
+                    <span class="name">{{ .Name }}</span>
+                    <span class="diff-count">{{ if eq .DiffResult.NumDiffs 0 }}✅{{else}}⚠️{{.DiffResult.NumDiffs}}{{end}}</span>
+                </div>
+                {{ range .Resources }}
+                    <div class="resource">
+                        <div class="resource-header status-{{ .DiffResult.Status }}">
+                            <span class="name">{{ .GroupVersionKind }}/{{ .Name}} [{{ .Namespace }}]</span>
+                            <span class="diff-count">{{ if eq .DiffResult.NumDiffs 0 }}✅{{else}}⚠️{{.DiffResult.NumDiffs}}{{end}}</span>
+                        </div>
+                        {{ if .Diffs }}<div class="resource-diffs">
+                            {{ range .Diffs }}
+                                <div class="diff">
+                                    <div class="diff-key">{{ .Key }}</div>
+                                    <div class="diff-content">{{ renderDiffHTML . }}</div>
+                                </div>
+                            {{ end }}
+                        </div>{{ end }}
+                    </div>
+                {{ end }}
+            </div>
+        {{ end }}
+    </div>
+</body>
+</html>

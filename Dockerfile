@@ -10,17 +10,15 @@ ADD . /go/src/github.com/monzo/kryp
 RUN cd /go/src/github.com/monzo/kryp && \
       make build-in-docker
 
-RUN mkdir -p /go/src/github.com/tomwilkie && \
-      cd /go/src/github.com/tomwilkie && \
-      git clone https://github.com/tomwilkie/prom-run.git && \
-      cd prom-run && \
-      make prom-run && \
-      mv /go/src/github.com/tomwilkie/prom-run/prom-run /out
-
 FROM scratch
 
-COPY --from=builder /out/prom-run /bin/prom-run
-COPY --from=builder /out/kryp /bin/kryp
+COPY --from=builder /out/krypd /bin/krypd
 
 VOLUME /data
+
+WORKDIR /web
+
+ADD ./assets /web/assets
+
+CMD ["/bin/krypd"]
 

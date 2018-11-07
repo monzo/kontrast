@@ -1,0 +1,114 @@
+body {
+    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+    background-color: #fdfdfd;
+    olor: #333;
+    margin: 0;
+}
+
+div {
+}
+
+*, :after, :before {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+.nav {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+.nav-cell {
+    float: left;
+    display: inline;
+    vertical-align: middle;
+    width: auto;
+    margin-left: 20px;
+    margin-right: 20px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.nav-cell.header {
+    font-weight: bold;
+}
+
+.nav-cell-right {
+    float: right;
+}
+
+.generated-time {
+    font-size: 80%;
+}
+
+.file-table {
+    margin: auto;
+    width: 80%;
+    border: 1px solid #eee;
+    border-radius: 3px;
+    margin-top: 30px;
+}
+
+.file {
+    border: 1px solid #eee;
+    border-radius: 3px;
+    margin: 20px 5px 20px 5px;
+    overflow: hidden;
+}
+
+.file-header, .resource-header {
+    overflow: hidden;
+    padding: 5px;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+}
+
+.resource {
+    border: 1px solid #eee;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+    margin-top: 10px;
+    margin-left: 30px;
+}
+
+.name {
+    display: inline;
+    float: left;
+    padding: 5px;
+}
+
+.diff-count {
+    display: inline;
+    float: right;
+    padding: 5px;
+    font-weight: bold;
+}
+
+.diff-content, .diff-key {
+    font-family: "Lucida Console",Monaco,monospace;
+    padding: 5px;
+}
+
+.diff-key {
+    font-size: 85%;
+    background-color: #e4e3e3;
+}
+
+.diff-content {
+    font-size: 75%;
+}
+
+.status-clean {
+    background-color: #ccffcd;
+}
+
+.status-diffs {
+    background-color: #ffc983;
+}
+
+.status-error {
+    background-color: #ef3a3a;
+}
+

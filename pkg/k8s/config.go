@@ -20,7 +20,7 @@ func LoadConfig(kubeconfig string) (*rest.Config, error) {
 		log.Warn("In cluster config not successful, trying out of cluster config (error: %v)", err)
 		config, err = clientcmd.BuildConfigFromFlags("", kubeconfig)
 		if err != nil {
-			log.Fatalf("Could not get out of cluster config: %v", err)
+			return config, err
 		}
 		log.Info("Loaded out of cluster config")
 	} else {

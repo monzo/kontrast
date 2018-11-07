@@ -15,19 +15,26 @@ var serverRes = []*regexp.Regexp{
 }
 
 func shouldKeepMetadata(d Delta) bool {
+
+	// Items to ignore in the source control files
 	switch d.SourceItem.Key {
 	case "apiVersion",
 		"kind",
 		"status.phase",
 		"metadata.creationTimestamp",
-		"metadata.namespace":
+		"metadata.namespace",
+		"spec.jobTemplate.spec.backoffLimit":
 		return false
 	}
+
+	// As above but looking at the source regex's
 	for _, re := range sourceRes {
 		if re.MatchString(d.SourceItem.Key) {
 			return false
 		}
 	}
+
+	// Items to ignore from the kubernetes API server
 	switch d.ServerItem.Key {
 	case "metadata.generation",
 		"metadata.selfLink",
@@ -44,6 +51,8 @@ func shouldKeepMetadata(d Delta) bool {
 			return false
 		}
 	}
+
+	// As above but looking at the server regex's
 	for _, re := range serverRes {
 		if re.MatchString(d.ServerItem.Key) {
 			return false

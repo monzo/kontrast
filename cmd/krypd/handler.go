@@ -66,6 +66,8 @@ func diffResultToEmoji(dr DiffResult) template.HTML {
 		return "⚠️"
 	case Error:
 		return "❌"
+	case New:
+		return "➕"
 	default:
 		return "❔"
 	}

@@ -22,13 +22,13 @@
             <div class="file">
                 <div class="file-header status-{{ .DiffResult.Status }}">
                     <span class="name">{{ .Name }}</span>
-                    <span class="diff-count">{{ if eq .DiffResult.NumDiffs 0 }}✅{{else}}⚠️{{.DiffResult.NumDiffs}}{{end}}</span>
+                    <span class="diff-count">{{ diffResultToEmoji .DiffResult }}</span>
                 </div>
                 {{ range .Resources }}
                     <div class="resource">
                         <div class="resource-header status-{{ .DiffResult.Status }}">
                             <span class="name">{{ .GroupVersionKind }}/{{ .Name}} [{{ .Namespace }}]</span>
-                            <span class="diff-count">{{ if eq .DiffResult.NumDiffs 0 }}✅{{else}}⚠️{{.DiffResult.NumDiffs}}{{end}}</span>
+                            <span class="diff-count">{{ diffResultToEmoji .DiffResult }}</span>
                         </div>
                         {{ if .Diffs }}<div class="resource-diffs">
                             {{ range .Diffs }}

@@ -33,7 +33,8 @@ func handleDiffDisplay(dm *DiffManager, path string) func(http.ResponseWriter, *
 				"humanizeTime": func(t time.Time) string {
 					return humanize.Time(t)
 				},
-				"renderDiffHTML": renderDiffHTML,
+				"renderDiffHTML":    renderDiffHTML,
+				"diffResultToEmoji": diffResultToEmoji,
 			}).
 			ParseFiles(templateFiles...)
 		if err != nil {
@@ -55,4 +56,17 @@ func renderDiffHTML(d Diff) template.HTML {
 	dmp := diffmatchpatch.New()
 	diffs := dmp.DiffMain(d.Left, d.Right, false)
 	return template.HTML(dmp.DiffPrettyHtml(diffs))
+}
+
+func diffResultToEmoji(dr DiffResult) template.HTML {
+	switch dr.Status {
+	case Clean:
+		return "✅"
+	case DiffPresent:
+		return "⚠️"
+	case Error:
+		return "❌"
+	default:
+		return "❔"
+	}
 }

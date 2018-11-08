@@ -10,10 +10,9 @@ import (
 	"k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/api/meta"
-	"k8s.io/apimachinery/pkg/util/yaml"
-
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
+	"k8s.io/apimachinery/pkg/util/yaml"
 	"k8s.io/client-go/discovery"
 	"k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/rest"
@@ -208,7 +207,7 @@ func (rh *ResourceHelper) buildGETRequestFor(r *Resource, export bool) (*rest.Re
 }
 
 func (rh *ResourceHelper) Get(r *Resource) (runtime.Object, error) {
-	req, err := rh.buildGETRequestFor(r, true)
+	req, err := rh.buildGETRequestFor(r, false)
 	if err != nil {
 		return &v1.List{}, err
 	}
@@ -268,9 +267,6 @@ func (rh *ResourceHelper) Delete(r *Resource) error {
 }
 
 func IsNotFoundError(err error) bool {
-	if err == nil {
-		return false
-	}
 	st, ok := err.(*errors.StatusError)
 	if ok {
 		return st.Status().Reason == "NotFound"

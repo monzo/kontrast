@@ -11,6 +11,7 @@ import (
 
 	"github.com/monzo/kryp/pkg/diff"
 	"github.com/monzo/kryp/pkg/k8s"
+	"k8s.io/client-go/rest"
 )
 
 var (
@@ -19,12 +20,16 @@ var (
 )
 
 func main() {
+
 	if home := homeDir(); home != "" {
 		kubeconfig = flag.String("kubeconfig", filepath.Join(home, ".kube", "config"), "(optional) absolute path to the kubeconfig file")
 	} else {
 		kubeconfig = flag.String("kubeconfig", "", "absolute path to the kubeconfig file")
 	}
+
 	colorDisabled := flag.Bool("no-color", false, "Disables ANSI colour output")
+	onlyShowDeltas := flag.Bool("deltas-only", true, "Only show files with changes")
+
 	flag.Parse()
 	args := flag.Args()
 
@@ -34,32 +39,39 @@ func main() {
 		flag.Usage()
 		fatal("Error: requires positional argument for directory/file to check")
 	}
-	log.SetOutput(ioutil.Discard)
-
-	filename := args[0]
 
 	config, err := k8s.LoadConfig(*kubeconfig)
 	if err != nil {
 		fatal("error: %f", err)
 	}
 
+	if deltas := scanForChanges(args[0], config, *onlyShowDeltas); deltas > 0 {
+		os.Exit(2)
+	}
+}
+
+func scanForChanges(filename string, config *rest.Config, onlyShowDeltas bool) int {
+
 	helper, err := k8s.NewResourceHelperWithDefaults(config)
 	if err != nil {
 		fatal("error: %f", err)
 	}
-	changesPresent := false
 
+	log.SetOutput(ioutil.Discard)
+
+	totalDeltas := 0
 	filepath.Walk(filename, func(fp string, fi os.FileInfo, err error) error {
+
 		if err != nil {
 			fmt.Println(err) // can't walk here,
-			return nil       // but continue walking elsewhere
+			return nil
 		}
+
 		if fi.IsDir() {
-			return nil // not a file.  ignore.
+			return nil // not a file. ignore.
 		}
 
 		if !strings.HasSuffix(fi.Name(), ".yaml") {
-			fmt.Printf("Ignoring %s as it doesn't end in .yaml\n", fp)
 			return nil
 		}
 
@@ -70,6 +82,8 @@ func main() {
 		}
 
 		for _, r := range resources {
+			changesPresent := false
+
 			d, err := diff.GetDiffsForResource(r, helper)
 			if err != nil {
 				fmt.Printf("Error getting resource: %v\n", err)
@@ -82,25 +96,23 @@ func main() {
 				status = "not found on server"
 				changesPresent = true
 			case diff.ChangesPresentDiff:
+				changesPresent = len(d.Deltas()) > 0
 				status = fmt.Sprintf("%d changes", len(d.Deltas()))
-				if len(d.Deltas()) > 0 {
-					changesPresent = true
-				}
 			}
-			kind := r.Object.GetObjectKind().GroupVersionKind().Kind
-			ref := fmt.Sprintf("%s/%s", r.Namespace, r.Name)
-			fmt.Printf("%-50s %-25s %-50s: %s\n", ref, kind, fp, status)
-			if changesPresent {
+
+			// If we want everything OR there are changes
+			if !onlyShowDeltas || changesPresent {
+				kind := r.Object.GetObjectKind().GroupVersionKind().Kind
+				ref := fmt.Sprintf("%s/%s", r.Namespace, r.Name)
+				fmt.Printf("%-50s %-25s %-50s: %s\n", ref, kind, fp, status)
 				fmt.Println(d.Pretty(colorEnabled))
+				totalDeltas++
 			}
 		}
 		return nil
 	})
 
-	if changesPresent {
-		os.Exit(2)
-	}
-
+	return totalDeltas
 }
 
 func fatal(msg string, args ...interface{}) {

@@ -4,7 +4,6 @@ import (
 	"log"
 
 	"github.com/monzo/kryp/pkg/k8s"
-	//_ "k8s.io/kubernetes/pkg/master"
 )
 
 // GetDiffsForResource takes a resource, and uses to generate a local Kubernetes object
@@ -35,7 +34,7 @@ func GetDiffsForResource(resource *k8s.Resource, helper *k8s.ResourceHelper) (Di
 
 	// Some deltas are to be expected, so we filter them
 	filtered := deltas
-	for _, f := range []DeltaFilter{MetadataFilter} {
+	for _, f := range []DeltaFilter{metadataFilter} {
 		filtered = f(filtered)
 	}
 

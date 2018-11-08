@@ -33,13 +33,10 @@ func GetDiffsForResource(resource *k8s.Resource, helper *k8s.ResourceHelper) (Di
 	}
 
 	// Some deltas are to be expected, so we filter them
-	filtered := deltas
-	for _, f := range []DeltaFilter{metadataFilter} {
-		filtered = f(filtered)
-	}
+	filteredDeltas := metadataFilter(deltas)
 
 	log.Printf("Found %d deltas", len(deltas))
-	return ChangesPresentDiff{DiffMeta: meta, deltas: filtered}, nil
+	return ChangesPresentDiff{DiffMeta: meta, deltas: filteredDeltas}, nil
 }
 
 var empty = struct{}{}

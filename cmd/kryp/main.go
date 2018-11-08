@@ -28,6 +28,7 @@ func main() {
 	}
 
 	colorDisabled := flag.Bool("no-color", false, "Disables ANSI colour output")
+	onlyShowDeltas := flag.Bool("deltas-only", true, "Only show files with changes")
 
 	flag.Parse()
 	args := flag.Args()
@@ -44,12 +45,12 @@ func main() {
 		fatal("error: %f", err)
 	}
 
-	if deltas := scanForChanges(args[0], config); deltas > 0 {
+	if deltas := scanForChanges(args[0], config, *onlyShowDeltas); deltas > 0 {
 		os.Exit(2)
 	}
 }
 
-func scanForChanges(filename string, config *rest.Config) int {
+func scanForChanges(filename string, config *rest.Config, onlyShowDeltas bool) int {
 
 	helper, err := k8s.NewResourceHelperWithDefaults(config)
 	if err != nil {
@@ -71,7 +72,6 @@ func scanForChanges(filename string, config *rest.Config) int {
 		}
 
 		if !strings.HasSuffix(fi.Name(), ".yaml") {
-			//fmt.Printf("Ignoring %s as it doesn't end in .yaml\n", fp)
 			return nil
 		}
 
@@ -96,13 +96,12 @@ func scanForChanges(filename string, config *rest.Config) int {
 				status = "not found on server"
 				changesPresent = true
 			case diff.ChangesPresentDiff:
-				if deltas := len(d.Deltas()); deltas > 0 {
-					changesPresent = true
-					status = fmt.Sprintf("%d changes", deltas)
-				}
+				changesPresent = len(d.Deltas()) > 0
+				status = fmt.Sprintf("%d changes", len(d.Deltas()))
 			}
 
-			if changesPresent {
+			// If we want everything OR there are changes
+			if !onlyShowDeltas || changesPresent {
 				kind := r.Object.GetObjectKind().GroupVersionKind().Kind
 				ref := fmt.Sprintf("%s/%s", r.Namespace, r.Name)
 				fmt.Printf("%-50s %-25s %-50s: %s\n", ref, kind, fp, status)

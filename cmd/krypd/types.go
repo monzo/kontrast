@@ -8,6 +8,7 @@ const (
 	Clean       DiffStatus = "clean"
 	DiffPresent            = "diffs"
 	Error                  = "error"
+	New                    = "new"
 )
 
 type DiffResult struct {

@@ -106,7 +106,7 @@ func (dm *DiffManager) processResource(k8sr *k8s.Resource) Resource {
 	switch d.(type) {
 	case diff.NotPresentOnServerDiff:
 		r.IsNewResource = true
-		r.DiffResult.Status = DiffPresent
+		r.DiffResult.Status = New
 		r.DiffResult.NumDiffs = 1
 	case diff.ChangesPresentDiff:
 		r.DiffResult.NumDiffs = len(d.Deltas())

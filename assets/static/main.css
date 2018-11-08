@@ -101,6 +101,10 @@ div {
 }
 
 .status-clean {
+    background-color: #e4e3e3;
+}
+
+.status-new {
     background-color: #ccffcd;
 }
 
@@ -109,6 +113,6 @@ div {
 }
 
 .status-error {
-    background-color: #ef3a3a;
+    background-color: #ea9595;
 }
 

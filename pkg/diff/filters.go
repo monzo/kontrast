@@ -47,8 +47,10 @@ func shouldKeepMetadata(d Delta) bool {
 	switch d.ServerItem.Key {
 	case "metadata.annotations":
 		anns, ok := d.ServerItem.Value.(map[string]interface{})
-		if ok && anns["kubectl.kubernetes.io/last-applied-configuration"] != struct{}{} {
-			return false
+		if ok {
+			if anns["kubectl.kubernetes.io/last-applied-configuration"] != struct{}{} || anns["pod.alpha.kubernetes.io/init-containers"] != struct{}{} {
+				return false
+			}
 		}
 	}
 

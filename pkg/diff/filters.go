@@ -8,6 +8,8 @@ var filters = []*regexp.Regexp{
 	regexp.MustCompile(`apiVersion`),
 	regexp.MustCompile(`kind`),
 	regexp.MustCompile(`metadata\.(creationTimestamp|generation|selfLink|resourceVersion|uid)`),
+	regexp.MustCompile(`spec.template.metadata.annotations.pod.alpha.kubernetes.io/init-containers`),
+	regexp.MustCompile(`spec.template.metadata.annotations.pod.beta.kubernetes.io/init-containers`),
 	regexp.MustCompile(`spec\.jobTemplate\.spec\.backoffLimit`),
 	regexp.MustCompile(`spec\.template\.spec\.volumes\.[0-9]+\.hostPath\.type`),
 	regexp.MustCompile(`spec\.template\.spec\.volumes\.[0-9]+\.emptyDir\.sizeLimit`),
@@ -48,7 +50,7 @@ func shouldKeepMetadata(d Delta) bool {
 	case "metadata.annotations":
 		anns, ok := d.ServerItem.Value.(map[string]interface{})
 		if ok {
-			if anns["kubectl.kubernetes.io/last-applied-configuration"] != struct{}{} || anns["pod.alpha.kubernetes.io/init-containers"] != struct{}{} {
+			if anns["kubectl.kubernetes.io/last-applied-configuration"] != struct{}{} {
 				return false
 			}
 		}

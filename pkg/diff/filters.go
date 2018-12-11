@@ -14,6 +14,7 @@ var filters = []*regexp.Regexp{
 	regexp.MustCompile(`spec\.template\.spec\.volumes\.[0-9]+\.hostPath\.type`),
 	regexp.MustCompile(`spec\.template\.spec\.volumes\.[0-9]+\.emptyDir\.sizeLimit`),
 	regexp.MustCompile(`spec\.template\.spec\.serviceAccount`),
+	regexp.MustCompile(`spec\.templateGeneration`),
 	regexp.MustCompile(`spec\.ports\.[0-9]+\.nodePort`),
 	regexp.MustCompile(`spec\.(clusterIP|volumeName)`),
 	regexp.MustCompile(`secrets`),

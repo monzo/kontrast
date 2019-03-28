@@ -1,12 +1,14 @@
 package diff
 
 import (
+	"math"
 	"regexp"
 )
 
 var filters = []*regexp.Regexp{
 	regexp.MustCompile(`apiVersion`),
 	regexp.MustCompile(`kind`),
+	regexp.MustCompile(`metadata\.finalizers`),
 	regexp.MustCompile(`metadata\.(creationTimestamp|generation|selfLink|resourceVersion|uid)`),
 	regexp.MustCompile(`spec.template.metadata.annotations.pod.alpha.kubernetes.io/init-containers`),
 	regexp.MustCompile(`spec.template.metadata.annotations.pod.beta.kubernetes.io/init-containers`),
@@ -15,6 +17,7 @@ var filters = []*regexp.Regexp{
 	regexp.MustCompile(`spec\.template\.spec\.volumes\.[0-9]+\.emptyDir\.sizeLimit`),
 	regexp.MustCompile(`spec\.template\.spec\.serviceAccount`),
 	regexp.MustCompile(`spec\.templateGeneration`),
+	regexp.MustCompile(`spec\.revisionHistoryLimit`),
 	regexp.MustCompile(`spec\.ports\.[0-9]+\.nodePort`),
 	regexp.MustCompile(`spec\.(clusterIP|volumeName)`),
 	regexp.MustCompile(`secrets`),
@@ -54,6 +57,12 @@ func shouldKeepMetadata(d Delta) bool {
 			if anns["kubectl.kubernetes.io/last-applied-configuration"] != struct{}{} {
 				return false
 			}
+		}
+	case "spec.progressDeadlineSeconds":
+		// Prior to K8s 1.10 this defaults to "nil", but from v1.10 onwards it is set to MaxInt32
+		vint, ok := d.ServerItem.Value.(float64)
+		if ok {
+			return vint != math.MaxInt32
 		}
 	}
 

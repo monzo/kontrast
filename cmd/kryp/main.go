@@ -9,8 +9,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/monzo/kryp/pkg/diff"
-	"github.com/monzo/kryp/pkg/k8s"
+	"github.com/monzo/kontrast/pkg/diff"
+	"github.com/monzo/kontrast/pkg/k8s"
 	"k8s.io/client-go/rest"
 )
 

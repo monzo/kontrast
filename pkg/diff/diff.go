@@ -3,7 +3,7 @@ package diff
 import (
 	"log"
 
-	"github.com/monzo/kryp/pkg/k8s"
+	"github.com/monzo/kontrast/pkg/k8s"
 )
 
 // GetDiffsForResource takes a resource, and uses to generate a local Kubernetes object

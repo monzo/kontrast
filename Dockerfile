@@ -6,13 +6,13 @@ RUN curl -fsSL -o /usr/local/bin/dep https://github.com/golang/dep/releases/down
 
 RUN mkdir -p /out
 
-ADD . /go/src/github.com/monzo/kryp
-RUN cd /go/src/github.com/monzo/kryp && \
+ADD . /go/src/github.com/monzo/kontrast
+RUN cd /go/src/github.com/monzo/kontrast && \
       make build-in-docker
 
 FROM scratch
 
-COPY --from=builder /out/krypd /bin/krypd
+COPY --from=builder /out/kontrastd /bin/kontrastd
 
 VOLUME /data
 
@@ -20,5 +20,5 @@ WORKDIR /web
 
 ADD ./assets /web/assets
 
-CMD ["/bin/krypd"]
+CMD ["/bin/kontrastd"]
 

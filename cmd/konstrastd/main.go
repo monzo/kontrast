@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/monzo/kryp/pkg/k8s"
+	"github.com/monzo/kontrast/pkg/k8s"
 	log "github.com/sirupsen/logrus"
 
 	"github.com/prometheus/client_golang/prometheus/promhttp"

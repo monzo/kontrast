@@ -35,8 +35,8 @@ var serverRes = []*regexp.Regexp{}
 //   Server:  {metadata.creationTimestamp 2018-10-15T13:21:32Z}
 //
 //   We do care about this:
-//   Source:  {spec.template.spec.containers.1.image 442690283804.dkr.ecr.eu-west-1.amazonaws.com/monzo/kryp:21069d0}
-//   Server:  {spec.template.spec.containers.1.image 442690283804.dkr.ecr.eu-west-1.amazonaws.com/monzo/kryp:1b1d0b3}
+//   Source:  {spec.template.spec.containers.1.image 442690283804.dkr.ecr.eu-west-1.amazonaws.com/monzo/kontrast:21069d0}
+//   Server:  {spec.template.spec.containers.1.image 442690283804.dkr.ecr.eu-west-1.amazonaws.com/monzo/kontrast:1b1d0b3}
 //
 func shouldKeepMetadata(d Delta) bool {
 

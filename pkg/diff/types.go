@@ -1,6 +1,6 @@
 package diff
 
-import "github.com/monzo/kryp/pkg/k8s"
+import "github.com/monzo/kontrast/pkg/k8s"
 
 type Item struct {
 	Key   string

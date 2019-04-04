@@ -6,8 +6,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/monzo/kryp/diff"
-	"github.com/monzo/kryp/k8s"
+	"github.com/monzo/kontrast/diff"
+	"github.com/monzo/kontrast/k8s"
 	"github.com/stretchr/testify/assert"
 )
 

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
 
-  <title>Kryp [{{ .DiffResult.NumDiffs }} diffs]</title>
+  <title>kontrast [{{ .DiffResult.NumDiffs }} diffs]</title>
 
   <link rel="stylesheet" href="static/main.css">
   <!-- <script src="js/scripts.js"></script> -->
@@ -12,7 +12,7 @@
 
 <body>
     <div class="nav status-{{ .DiffResult.Status }}">
-        <span class="nav-cell header">Kryp</span>
+        <span class="nav-cell header">kontrast</span>
         <span class="nav-cell">{{ .DiffResult.NumDiffs }} diffs</span>
         <span class="nav-cell nav-cell-right generated-time">generated {{ humanizeTime .Time }}</span>
     </div>

@@ -7,8 +7,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/monzo/kryp/pkg/diff"
-	"github.com/monzo/kryp/pkg/k8s"
+	"github.com/monzo/kontrast/pkg/diff"
+	"github.com/monzo/kontrast/pkg/k8s"
 	"github.com/prometheus/client_golang/prometheus"
 	log "github.com/sirupsen/logrus"
 	"k8s.io/client-go/rest"
@@ -22,7 +22,7 @@ type DiffManager struct {
 
 var (
 	currentDiffsGauge = prometheus.NewGauge(prometheus.GaugeOpts{
-		Name: "kryp_current_diffs",
+		Name: "kontrast_current_diffs",
 		Help: "Number of diffs between manifests and cluster",
 	})
 )

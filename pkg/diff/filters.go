@@ -3,6 +3,8 @@ package diff
 import (
 	"math"
 	"regexp"
+
+	"github.com/fatih/color"
 )
 
 var filters = []*regexp.Regexp{
@@ -10,6 +12,7 @@ var filters = []*regexp.Regexp{
 	regexp.MustCompile(`kind`),
 	regexp.MustCompile(`metadata\.finalizers`),
 	regexp.MustCompile(`metadata\.(creationTimestamp|generation|selfLink|resourceVersion|uid)`),
+	regexp.MustCompile(`metadata\.annotations\.kubectl\.kubernetes\.io/last-applied-configuration`),
 	regexp.MustCompile(`spec.template.metadata.annotations.pod.alpha.kubernetes.io/init-containers`),
 	regexp.MustCompile(`spec.template.metadata.annotations.pod.beta.kubernetes.io/init-containers`),
 	regexp.MustCompile(`spec\.jobTemplate\.spec\.backoffLimit`),
@@ -25,6 +28,11 @@ var filters = []*regexp.Regexp{
 }
 
 var serverRes = []*regexp.Regexp{}
+
+var annotationBlacklist = []string{
+	"kubectl.kubernetes.io/last-applied-configuration",
+	"deployment.kubernetes.io/revision",
+}
 
 // This function receives a diff between the source and server for a sepcific key
 // and returns whether we should care about the delta
@@ -49,13 +57,16 @@ func shouldKeepMetadata(d Delta) bool {
 		}
 	}
 
+	color.Cyan("%s : %s", d.ServerItem.Key, d.SourceItem.Key)
 	// Special cases for things that harder to filter with a regex :-)
 	switch d.ServerItem.Key {
 	case "metadata.annotations":
 		anns, ok := d.ServerItem.Value.(map[string]interface{})
 		if ok {
-			if anns["kubectl.kubernetes.io/last-applied-configuration"] != struct{}{} {
-				return false
+			for _, a := range annotationBlacklist {
+				if _, exists := anns[a]; exists {
+					return false
+				}
 			}
 		}
 	case "spec.progressDeadlineSeconds":

@@ -3,8 +3,6 @@ package diff
 import (
 	"math"
 	"regexp"
-
-	"github.com/fatih/color"
 )
 
 var filters = []*regexp.Regexp{
@@ -57,7 +55,6 @@ func shouldKeepMetadata(d Delta) bool {
 		}
 	}
 
-	color.Cyan("%s : %s", d.ServerItem.Key, d.SourceItem.Key)
 	// Special cases for things that harder to filter with a regex :-)
 	switch d.ServerItem.Key {
 	case "metadata.annotations":

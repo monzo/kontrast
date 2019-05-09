@@ -21,10 +21,10 @@ type DiffManager struct {
 }
 
 var (
-	currentDiffsGauge = prometheus.NewGauge(prometheus.GaugeOpts{
+	currentDiffsGauge = prometheus.NewGaugeVec(prometheus.GaugeOpts{
 		Name: "kontrast_current_diffs",
 		Help: "Number of diffs between manifests and cluster",
-	})
+	}, []string{"object"})
 )
 
 func (dm *DiffManager) DiffRun(path string) (*DiffRun, error) {
@@ -53,7 +53,7 @@ func (dm *DiffManager) DiffRun(path string) (*DiffRun, error) {
 		d.Files = append(d.Files, f)
 		return nil
 	})
-	currentDiffsGauge.Set(float64(numDiffs))
+
 	d.DiffResult = DiffFromNumber(numDiffs)
 	dm.LastRun = d
 	dm.LastErr = err
@@ -112,6 +112,9 @@ func (dm *DiffManager) processResource(k8sr *k8s.Resource) Resource {
 		r.DiffResult.NumDiffs = len(d.Deltas())
 		if len(d.Deltas()) > 0 {
 			r.DiffResult.Status = DiffPresent
+			label := fmt.Sprintf("%s/%s", gvk.Kind, r.Name)
+			currentDiffsGauge.WithLabelValues(label).Set(float64(len(d.Deltas())))
+			log.Infof("Found a diff in: %v\n", label)
 		} else {
 			r.DiffResult.Status = Clean
 		}

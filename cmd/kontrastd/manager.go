@@ -103,17 +103,23 @@ func (dm *DiffManager) processResource(k8sr *k8s.Resource) Resource {
 		return r
 	}
 
+	label := fmt.Sprintf("%s/%s", gvk.Kind, r.Name)
+
 	switch d.(type) {
 	case diff.NotPresentOnServerDiff:
 		r.IsNewResource = true
 		r.DiffResult.Status = New
 		r.DiffResult.NumDiffs = 1
+		currentDiffsGauge.WithLabelValues(label).Set(1)
+
 	case diff.ChangesPresentDiff:
 		r.DiffResult.NumDiffs = len(d.Deltas())
+
+		// Set the gauge when present, reset when the diff is cleared.
+		currentDiffsGauge.WithLabelValues(label).Set(float64(r.DiffResult.NumDiffs))
+
 		if len(d.Deltas()) > 0 {
 			r.DiffResult.Status = DiffPresent
-			label := fmt.Sprintf("%s/%s", gvk.Kind, r.Name)
-			currentDiffsGauge.WithLabelValues(label).Set(float64(len(d.Deltas())))
 			log.Infof("Found a diff in: %v\n", label)
 		} else {
 			r.DiffResult.Status = Clean

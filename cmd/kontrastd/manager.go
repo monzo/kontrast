@@ -7,11 +7,17 @@ import (
 	"strings"
 	"time"
 
-	"github.com/monzo/kontrast/pkg/diff"
-	"github.com/monzo/kontrast/pkg/k8s"
 	"github.com/prometheus/client_golang/prometheus"
 	log "github.com/sirupsen/logrus"
 	"k8s.io/client-go/rest"
+
+	"github.com/monzo/kontrast/pkg/diff"
+	"github.com/monzo/kontrast/pkg/k8s"
+)
+
+const (
+	objectLabel = "object"
+	nsLabel     = "namespace"
 )
 
 type DiffManager struct {
@@ -24,7 +30,7 @@ var (
 	currentDiffsGauge = prometheus.NewGaugeVec(prometheus.GaugeOpts{
 		Name: "kontrast_current_diffs",
 		Help: "Number of diffs between manifests and cluster",
-	}, []string{"object"})
+	}, []string{objectLabel, nsLabel})
 )
 
 func (dm *DiffManager) DiffRun(path string) (*DiffRun, error) {
@@ -105,18 +111,23 @@ func (dm *DiffManager) processResource(k8sr *k8s.Resource) Resource {
 
 	label := fmt.Sprintf("%s/%s", gvk.Kind, r.Name)
 
+	labelledGauge := currentDiffsGauge.With(prometheus.Labels{
+		objectLabel: label,
+		nsLabel:     k8sr.Namespace,
+	})
+
 	switch d.(type) {
 	case diff.NotPresentOnServerDiff:
 		r.IsNewResource = true
 		r.DiffResult.Status = New
 		r.DiffResult.NumDiffs = 1
-		currentDiffsGauge.WithLabelValues(label).Set(1)
+		labelledGauge.Set(1)
 
 	case diff.ChangesPresentDiff:
 		r.DiffResult.NumDiffs = len(d.Deltas())
 
 		// Set the gauge when present, reset when the diff is cleared.
-		currentDiffsGauge.WithLabelValues(label).Set(float64(r.DiffResult.NumDiffs))
+		labelledGauge.Set(float64(r.DiffResult.NumDiffs))
 
 		if len(d.Deltas()) > 0 {
 			r.DiffResult.Status = DiffPresent

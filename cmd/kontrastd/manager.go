@@ -17,7 +17,7 @@ import (
 
 const (
 	objectLabel = "object"
-	nsLabel     = "namespace"
+	nsLabel     = "object_ns"
 )
 
 type DiffManager struct {

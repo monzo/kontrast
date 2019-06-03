@@ -19,40 +19,42 @@
 
     <div class="file-table">
         {{ range .Files }}
-            <div class="file">
-                <div class="file-header status-{{ .DiffResult.Status }}">
-                    <span class="name">{{ .Name }}</span>
-                    <span class="diff-count">{{ diffResultToEmoji .DiffResult }}</span>
-                </div>
-                {{ range .Resources }}
-                    <div class="resource">
-                        <div class="resource-header status-{{ .DiffResult.Status }}">
-                            <span class="name">{{ .GroupVersionKind }}/{{ .Name}} [{{ .Namespace }}]</span>
-                            <span class="diff-count">{{ diffResultToEmoji .DiffResult }}</span>
-                        </div>
-                        {{ if eq .DiffResult.Status "new" }}<div class="resource-diffs">
-                                    <div class="diff">
-                                        <div class="diff-key status-new">New resource</div>
-                                        <div class="diff-content">&nbsp;</div>
-                                    </div>
-                        </div>{{ else if .DiffResult.Error }}<div class="resource-diffs">
-                                    <div class="diff">
-                                        <div class="diff-key status-error">Error</div>
-                                        <div class="diff-content">{{ .DiffResult.Error }}</div>
-                                    </div>
-                        </div>{{ else }}
-                            {{ if .Diffs }}<div class="resource-diffs">
-                                {{ range .Diffs }}
-                                    <div class="diff">
-                                        <div class="diff-key">{{ .Key }}</div>
-                                        <div class="diff-content">{{ renderDiffHTML . }}</div>
-                                    </div>
-                                {{ end }}
-                            </div>{{ end }}
-                        {{ end }}
+            {{- if ne .DiffResult.Status "clean" -}}
+                <div class="file">
+                    <div class="file-header status-{{ .DiffResult.Status }}">
+                        <span class="name">{{ .Name }}</span>
+                        <span class="diff-count">{{ diffResultToEmoji .DiffResult }}</span>
                     </div>
-                {{ end }}
-            </div>
+                    {{ range .Resources }}
+                        <div class="resource">
+                            <div class="resource-header status-{{ .DiffResult.Status }}">
+                                <span class="name">{{ .GroupVersionKind }}/{{ .Name}} [{{ .Namespace }}]</span>
+                                <span class="diff-count">{{ diffResultToEmoji .DiffResult }}</span>
+                            </div>
+                            {{ if eq .DiffResult.Status "new" }}<div class="resource-diffs">
+                                        <div class="diff">
+                                            <div class="diff-key status-new">New resource</div>
+                                            <div class="diff-content">&nbsp;</div>
+                                        </div>
+                            </div>{{ else if .DiffResult.Error }}<div class="resource-diffs">
+                                        <div class="diff">
+                                            <div class="diff-key status-error">Error</div>
+                                            <div class="diff-content">{{ .DiffResult.Error }}</div>
+                                        </div>
+                            </div>{{ else }}
+                                {{ if .Diffs }}<div class="resource-diffs">
+                                    {{ range .Diffs }}
+                                        <div class="diff">
+                                            <div class="diff-key">{{ .Key }}</div>
+                                            <div class="diff-content">{{ renderDiffHTML . }}</div>
+                                        </div>
+                                    {{ end }}
+                                </div>{{ end }}
+                            {{ end }}
+                        </div>
+                    {{ end }}
+                </div>
+            {{ end }}
         {{ end }}
     </div>
 </body>

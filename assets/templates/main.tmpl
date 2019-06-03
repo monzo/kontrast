@@ -25,6 +25,11 @@
                         <span class="name">{{ .Name }}</span>
                         <span class="diff-count">{{ diffResultToEmoji .DiffResult }}</span>
                     </div>
+                    {{ if .DiffResult.Error }}<div class="resource-diffs">
+                        <div class="diff">
+                            <div class="diff-content">{{ .DiffResult.Error }}</div>
+                        </div>
+                    </div>{{ end }}
                     {{ range .Resources }}
                         <div class="resource">
                             <div class="resource-header status-{{ .DiffResult.Status }}">

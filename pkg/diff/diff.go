@@ -35,7 +35,6 @@ func GetDiffsForResource(resource *k8s.Resource, helper *k8s.ResourceHelper) (Di
 	// Some deltas are to be expected, so we filter them
 	filteredDeltas := metadataFilter(deltas)
 
-	log.Printf("Found %d deltas", len(deltas))
 	return ChangesPresentDiff{DiffMeta: meta, deltas: filteredDeltas}, nil
 }
 

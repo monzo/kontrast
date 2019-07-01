@@ -109,6 +109,13 @@ func (rh *ResourceHelper) NewResourceFromBytes(bytes []byte) (*Resource, error) 
 		return nil, nil
 	}
 
+	// Base64 errors are most often caused by having dummy passwords in Secret files.
+	// A `fmt.Errorf` in the call stack removed the type, so this is all there is left.
+	// Check for `base64.CorruptInputError` if possible.
+	if strings.Contains(err.Error(), "illegal base64 data at input byte") {
+		return nil, nil
+	}
+
 	if err != nil {
 		return &Resource{}, fmt.Errorf("parse resource from bytes: %s", err.Error())
 	}

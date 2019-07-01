@@ -89,7 +89,9 @@ func (rh *ResourceHelper) NewResourcesFromFilename(filename string) ([]*Resource
 			return []*Resource{}, fmt.Errorf("deserialise resource %s: %s", filename, err.Error())
 		}
 
-		resources = append(resources, res)
+		if res != nil {
+			resources = append(resources, res)
+		}
 	}
 }
 
@@ -101,6 +103,11 @@ func (rh *ResourceHelper) NewResourceFromBytes(bytes []byte) (*Resource, error) 
 	// K8s deserialiser does all the hard work for us here - figures out
 	// format, API group, kind, version
 	obj, _, err := scheme.Codecs.UniversalDeserializer().Decode(bytes, nil, nil)
+
+	// A missing `Kind` most probably meant an empty document
+	if runtime.IsMissingKind(err) {
+		return nil, nil
+	}
 
 	if err != nil {
 		return &Resource{}, fmt.Errorf("parse resource from bytes: %s", err.Error())

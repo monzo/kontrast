@@ -15,6 +15,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/util/yaml"
+	vpaclientsetscheme "k8s.io/autoscaler/vertical-pod-autoscaler/pkg/client/clientset/versioned/scheme"
 	"k8s.io/client-go/discovery"
 	"k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/rest"
@@ -28,6 +29,13 @@ type ResourceHelper struct {
 	meta.RESTMapper
 	DefaultNamespace string
 	Scheme           *runtime.Scheme
+}
+
+func init() {
+	// Explicitly import and register VerticalPodAutoscaler are a CRD
+	// definitions because they are not part of code k8s API but kontrast needs
+	// to know about them.
+	vpaclientsetscheme.AddToScheme(scheme.Scheme)
 }
 
 func NewResourceHelperWithDefaults(config *rest.Config) (*ResourceHelper, error) {

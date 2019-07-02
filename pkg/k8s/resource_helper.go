@@ -2,6 +2,7 @@ package k8s
 
 import (
 	"bufio"
+	"bytes"
 	"fmt"
 	"log"
 	"os"
@@ -73,9 +74,20 @@ func (rh *ResourceHelper) NewResourcesFromFilename(filename string) ([]*Resource
 	decoder := yaml.NewYAMLReader(reader)
 
 	for {
-		bytes, err := decoder.Read()
+		bs, err := decoder.Read()
 
-		if len(bytes) == 0 {
+		if err != nil {
+			return []*Resource{}, fmt.Errorf("decode doc from %s: %s", filename, err.Error())
+		}
+
+		// Converting to JSON and looking for "null" ignores empty docs.
+		bs, err = yaml.ToJSON(bs)
+
+		if err != nil {
+			return []*Resource{}, fmt.Errorf("failed to convert yaml to json %s: %s", filename, err.Error())
+		}
+
+		if len(bs) == 0 || bytes.Equal(bs, []byte("null")) {
 			// no more documents
 			return resources, nil
 		}
@@ -84,12 +96,14 @@ func (rh *ResourceHelper) NewResourcesFromFilename(filename string) ([]*Resource
 			return []*Resource{}, fmt.Errorf("decode doc from %s: %s", filename, err.Error())
 		}
 
-		res, err := rh.NewResourceFromBytes(bytes)
+		res, err := rh.NewResourceFromBytes(bs)
 		if err != nil {
 			return []*Resource{}, fmt.Errorf("deserialise resource %s: %s", filename, err.Error())
 		}
 
-		resources = append(resources, res)
+		if res != nil {
+			resources = append(resources, res)
+		}
 	}
 }
 

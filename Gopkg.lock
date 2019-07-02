@@ -1290,6 +1290,20 @@
   version = "kubernetes-1.11.0"
 
 [[projects]]
+  branch = "master"
+  digest = "1:9a5760f039202bce26dde0a657772958760f70e93e580628572416b45cd38ded"
+  name = "k8s.io/autoscaler"
+  packages = [
+    "vertical-pod-autoscaler/pkg/apis/autoscaling.k8s.io/v1",
+    "vertical-pod-autoscaler/pkg/apis/autoscaling.k8s.io/v1beta1",
+    "vertical-pod-autoscaler/pkg/apis/autoscaling.k8s.io/v1beta2",
+    "vertical-pod-autoscaler/pkg/apis/poc.autoscaling.k8s.io/v1alpha1",
+    "vertical-pod-autoscaler/pkg/client/clientset/versioned/scheme",
+  ]
+  pruneopts = "UT"
+  revision = "fc204e62cb9603ebcdb34322fca87f8db7235bba"
+
+[[projects]]
   digest = "1:b040602774f108218d6953850ea31982ede739174470844ca77de41b53290f59"
   name = "k8s.io/client-go"
   packages = [
@@ -1904,6 +1918,7 @@
     "k8s.io/apimachinery/pkg/runtime/serializer",
     "k8s.io/apimachinery/pkg/runtime/serializer/json",
     "k8s.io/apimachinery/pkg/util/yaml",
+    "k8s.io/autoscaler/vertical-pod-autoscaler/pkg/client/clientset/versioned/scheme",
     "k8s.io/client-go/discovery",
     "k8s.io/client-go/kubernetes/scheme",
     "k8s.io/client-go/rest",

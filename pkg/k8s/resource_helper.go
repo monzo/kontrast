@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"strings"
@@ -76,6 +77,11 @@ func (rh *ResourceHelper) NewResourcesFromFilename(filename string) ([]*Resource
 	for {
 		bs, err := decoder.Read()
 
+		if err == io.EOF || len(bs) == 0 {
+			// no more documents
+			return resources, nil
+		}
+
 		if err != nil {
 			return []*Resource{}, fmt.Errorf("decode doc from %s: %s", filename, err.Error())
 		}
@@ -87,13 +93,10 @@ func (rh *ResourceHelper) NewResourcesFromFilename(filename string) ([]*Resource
 			return []*Resource{}, fmt.Errorf("failed to convert yaml to json %s: %s", filename, err.Error())
 		}
 
-		if len(bs) == 0 || bytes.Equal(bs, []byte("null")) {
-			// no more documents
-			return resources, nil
-		}
-
-		if err != nil {
-			return []*Resource{}, fmt.Errorf("decode doc from %s: %s", filename, err.Error())
+		if bytes.Equal(bs, []byte("null")) {
+			// Skip over empty docs rather than return anything here, there
+			// might be other docs in the same file.
+			continue
 		}
 
 		res, err := rh.NewResourceFromBytes(bs)

@@ -20,6 +20,7 @@ import (
 	"k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/restmapper"
+	apiservicescheme "k8s.io/kube-aggregator/pkg/client/clientset_generated/clientset/scheme"
 )
 
 // ResourceHelper manages getting, updating, creating/deleting K8s objects with
@@ -36,6 +37,7 @@ func init() {
 	// definitions because they are not part of code k8s API but kontrast needs
 	// to know about them.
 	vpaclientsetscheme.AddToScheme(scheme.Scheme)
+	apiservicescheme.AddToScheme(scheme.Scheme)
 }
 
 func NewResourceHelperWithDefaults(config *rest.Config) (*ResourceHelper, error) {

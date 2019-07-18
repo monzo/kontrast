@@ -35,6 +35,10 @@
   name = "k8s.io/kubernetes"
   version = "v1.11.0"
 
+[[constraint]]
+  name = "k8s.io/kube-aggregator"
+  version = "kubernetes-1.11.0"
+
 [[override]]
   name = "k8s.io/apiserver"
   version = "kubernetes-1.11.0"

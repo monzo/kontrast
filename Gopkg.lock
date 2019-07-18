@@ -1446,6 +1446,19 @@
   version = "v8.0.0"
 
 [[projects]]
+  digest = "1:10f98f2363493d525936f4460d32aa6a58033b13a75e47ab9eb24fb3a18c8fc4"
+  name = "k8s.io/kube-aggregator"
+  packages = [
+    "pkg/apis/apiregistration",
+    "pkg/apis/apiregistration/v1",
+    "pkg/apis/apiregistration/v1beta1",
+    "pkg/client/clientset_generated/clientset/scheme",
+  ]
+  pruneopts = "UT"
+  revision = "bd6e1ad75c9758cad2069bb2f65880cf805ad8e9"
+  version = "kubernetes-1.11.0"
+
+[[projects]]
   branch = "master"
   digest = "1:a8a0fdd623b2a37c433d137bddfab6b155e988efbc7cd68c18f9923dce6c8742"
   name = "k8s.io/kube-openapi"
@@ -1924,6 +1937,7 @@
     "k8s.io/client-go/rest",
     "k8s.io/client-go/restmapper",
     "k8s.io/client-go/tools/clientcmd",
+    "k8s.io/kube-aggregator/pkg/client/clientset_generated/clientset/scheme",
     "k8s.io/kubernetes/pkg/api/legacyscheme",
     "k8s.io/kubernetes/pkg/master",
   ]

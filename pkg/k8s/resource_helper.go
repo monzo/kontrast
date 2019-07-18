@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"k8s.io/api/core/v1"
+	crdscheme "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset/scheme"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -38,6 +39,7 @@ func init() {
 	// to know about them.
 	vpaclientsetscheme.AddToScheme(scheme.Scheme)
 	apiservicescheme.AddToScheme(scheme.Scheme)
+	crdscheme.AddToScheme(scheme.Scheme)
 }
 
 func NewResourceHelperWithDefaults(config *rest.Config) (*ResourceHelper, error) {

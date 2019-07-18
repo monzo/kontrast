@@ -1116,12 +1116,17 @@
   version = "kubernetes-1.11.0"
 
 [[projects]]
-  branch = "master"
-  digest = "1:fa432f3acd7631bca4888e8d0f1db60cc46aef6a2d85a7f87f0ade54ea0ba56e"
+  digest = "1:c34e9f3c37539a99d042f4fd7c2f518d44e58d2b8ad500abf7daf81e63322da0"
   name = "k8s.io/apiextensions-apiserver"
-  packages = ["pkg/features"]
+  packages = [
+    "pkg/apis/apiextensions",
+    "pkg/apis/apiextensions/v1beta1",
+    "pkg/client/clientset/clientset/scheme",
+    "pkg/features",
+  ]
   pruneopts = "UT"
-  revision = "ec10020626427d80182b3ced76719cd02256b427"
+  revision = "3de98c57bc05a81cf463e0ad7a0af4cec8a5b510"
+  version = "kubernetes-1.11.0"
 
 [[projects]]
   digest = "1:137cc3066af426053637a6f8ff13ca4af3dc1328bb793890130984d9aad76881"
@@ -1924,6 +1929,7 @@
     "github.com/yudai/gojsondiff",
     "golang.org/x/crypto/ssh/terminal",
     "k8s.io/api/core/v1",
+    "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset/scheme",
     "k8s.io/apimachinery/pkg/api/errors",
     "k8s.io/apimachinery/pkg/api/meta",
     "k8s.io/apimachinery/pkg/runtime",

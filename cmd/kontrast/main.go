@@ -20,13 +20,14 @@ var (
 )
 
 func main() {
-
-	if home := homeDir(); home != "" {
-		kubeconfig = flag.String("kubeconfig", filepath.Join(home, ".kube", "config"), "(optional) absolute path to the kubeconfig file")
-	} else {
-		kubeconfig = flag.String("kubeconfig", "", "absolute path to the kubeconfig file")
+	defaultKubeConfig := os.Getenv("KUBECONFIG")
+	if defaultKubeConfig == "" {
+		if home, err := os.UserHomeDir(); err == nil {
+			defaultKubeConfig = filepath.Join(home, ".kube", "config")
+		}
 	}
 
+	kubeconfig = flag.String("kubeconfig", defaultKubeConfig, "(optional) absolute path to the kubeconfig file")
 	colorDisabled := flag.Bool("no-color", false, "Disables ANSI colour output")
 	onlyShowDeltas := flag.Bool("deltas-only", true, "Only show files with changes")
 
@@ -118,11 +119,4 @@ func scanForChanges(filename string, config *rest.Config, onlyShowDeltas bool) i
 func fatal(msg string, args ...interface{}) {
 	fmt.Printf(msg+"\n", args)
 	os.Exit(1)
-}
-
-func homeDir() string {
-	if h := os.Getenv("HOME"); h != "" {
-		return h
-	}
-	return os.Getenv("USERPROFILE") // windows
 }

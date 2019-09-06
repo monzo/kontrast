@@ -20,11 +20,14 @@ var (
 )
 
 func main() {
-	if home := homeDir(); home != "" {
-		kubeconfig = flag.String("kubeconfig", filepath.Join(home, ".kube", "config"), "(optional) absolute path to the kubeconfig file")
-	} else {
-		kubeconfig = flag.String("kubeconfig", "", "absolute path to the kubeconfig file")
+	defaultKubeConfig := os.Getenv("KUBECONFIG")
+	if defaultKubeConfig == "" {
+		if home, err := os.UserHomeDir(); err == nil {
+			defaultKubeConfig = filepath.Join(home, ".kube", "config")
+		}
 	}
+
+	kubeconfig = flag.String("kubeconfig", defaultKubeConfig, "(optional) absolute path to the kubeconfig file")
 
 	flag.Parse()
 	args := flag.Args()
@@ -67,11 +70,4 @@ func main() {
 
 	log.Infof("Listening on %s", *addr)
 	log.Fatal(http.ListenAndServe(*addr, nil))
-}
-
-func homeDir() string {
-	if h := os.Getenv("HOME"); h != "" {
-		return h
-	}
-	return os.Getenv("USERPROFILE") // windows
 }

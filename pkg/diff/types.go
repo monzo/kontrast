@@ -12,6 +12,13 @@ type Delta struct {
 	ServerItem Item
 }
 
+func (d Delta) Key() string {
+	if d.SourceItem.Key != "" {
+		return d.SourceItem.Key
+	}
+	return d.ServerItem.Key
+}
+
 type Diff interface {
 	Deltas() []Delta
 	Pretty(colorEnabled bool) string

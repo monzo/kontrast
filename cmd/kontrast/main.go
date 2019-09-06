@@ -46,6 +46,8 @@ func main() {
 		fatal("error: %f", err)
 	}
 
+	fmt.Println()
+
 	if deltas := scanForChanges(args[0], config, *onlyShowDeltas); deltas > 0 {
 		os.Exit(2)
 	}
@@ -105,7 +107,7 @@ func scanForChanges(filename string, config *rest.Config, onlyShowDeltas bool) i
 			if !onlyShowDeltas || changesPresent {
 				kind := r.Object.GetObjectKind().GroupVersionKind().Kind
 				ref := fmt.Sprintf("%s/%s", r.Namespace, r.Name)
-				fmt.Printf("%-50s %-25s %-50s: %s\n", ref, kind, fp, status)
+				fmt.Printf("%-50s %-25s %-50s: %s\n\n", ref, kind, fp, status)
 				fmt.Println(d.Pretty(colorEnabled))
 				totalDeltas++
 			}

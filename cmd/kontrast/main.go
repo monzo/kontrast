@@ -117,6 +117,6 @@ func scanForChanges(filename string, config *rest.Config, onlyShowDeltas bool) i
 }
 
 func fatal(msg string, args ...interface{}) {
-	fmt.Printf(msg+"\n", args)
+	fmt.Printf(msg+"\n", args...)
 	os.Exit(1)
 }

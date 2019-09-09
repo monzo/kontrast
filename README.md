@@ -13,6 +13,13 @@ Note: this takes a while [1]
 `kontrast my-manifest.yaml`
 
 
+## Release process
+
+1. Create a new semver version tag on master in "v0.1.2" format
+2. Push the tag
+3. Run `make clean dist` to build the binary releases
+4. Create a new release on Github and upload all files from `bin/`
+
 ---
 ###### [1] Why does it take so long to build/install? Why is the binary 150MB?
 

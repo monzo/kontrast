@@ -10,6 +10,7 @@ var filters = []*regexp.Regexp{
 	regexp.MustCompile(`kind`),
 	regexp.MustCompile(`metadata\.finalizers`),
 	regexp.MustCompile(`metadata\.(creationTimestamp|generation|selfLink|resourceVersion|uid)`),
+	regexp.MustCompile(`metadata\.annotations\.deployment\.kubernetes\.io/revision`),
 	regexp.MustCompile(`metadata\.annotations\.kubectl\.kubernetes\.io/last-applied-configuration`),
 	regexp.MustCompile(`spec.template.metadata.annotations.pod.alpha.kubernetes.io/init-containers`),
 	regexp.MustCompile(`spec.template.metadata.annotations.pod.beta.kubernetes.io/init-containers`),

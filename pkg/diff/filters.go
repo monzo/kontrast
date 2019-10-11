@@ -31,6 +31,7 @@ var serverRes = []*regexp.Regexp{}
 var annotationBlacklist = []string{
 	"kubectl.kubernetes.io/last-applied-configuration",
 	"deployment.kubernetes.io/revision",
+	"kubectl.kubernetes.io/restartedAt",
 }
 
 // This function receives a diff between the source and server for a sepcific key

@@ -14,6 +14,7 @@ var filters = []*regexp.Regexp{
 	regexp.MustCompile(`metadata\.annotations\.kubectl\.kubernetes\.io/last-applied-configuration`),
 	regexp.MustCompile(`spec.template.metadata.annotations.pod.alpha.kubernetes.io/init-containers`),
 	regexp.MustCompile(`spec.template.metadata.annotations.pod.beta.kubernetes.io/init-containers`),
+	regexp.MustCompile(`spec.template.metadata.annotations.kubectl.kubernetes.io/restartedAt`),
 	regexp.MustCompile(`spec\.jobTemplate\.spec\.backoffLimit`),
 	regexp.MustCompile(`spec\.template\.spec\.volumes\.[0-9]+\.hostPath\.type`),
 	regexp.MustCompile(`spec\.template\.spec\.volumes\.[0-9]+\.emptyDir\.sizeLimit`),
@@ -31,7 +32,6 @@ var serverRes = []*regexp.Regexp{}
 var annotationBlacklist = []string{
 	"kubectl.kubernetes.io/last-applied-configuration",
 	"deployment.kubernetes.io/revision",
-	"kubectl.kubernetes.io/restartedAt",
 }
 
 // This function receives a diff between the source and server for a sepcific key

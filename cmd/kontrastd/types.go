@@ -52,6 +52,7 @@ type File struct {
 type Resource struct {
 	Name             string
 	Namespace        string
+	Kind             string
 	GroupVersionKind string
 	IsNewResource    bool
 	Diffs            []Diff

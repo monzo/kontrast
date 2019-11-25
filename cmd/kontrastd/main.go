@@ -10,6 +10,7 @@ import (
 	"github.com/monzo/kontrast/pkg/k8s"
 	log "github.com/sirupsen/logrus"
 
+	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
@@ -51,6 +52,10 @@ func main() {
 	if err != nil {
 		log.Fatalf("error: %f", err)
 	}
+
+	// Set up the Prometheus collector
+	collector := NewKontrastCollector(dm)
+	prometheus.MustRegister(collector)
 
 	go dm.DiffRun(filename)
 	updateTicker := time.NewTicker(intervalDuration)

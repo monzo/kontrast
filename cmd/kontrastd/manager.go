@@ -5,9 +5,9 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 	"time"
 
-	"github.com/prometheus/client_golang/prometheus"
 	log "github.com/sirupsen/logrus"
 	"k8s.io/client-go/rest"
 
@@ -15,23 +15,12 @@ import (
 	"github.com/monzo/kontrast/pkg/k8s"
 )
 
-const (
-	objectLabel = "object"
-	nsLabel     = "object_ns"
-)
-
 type DiffManager struct {
+	mu      *sync.RWMutex
 	LastRun *DiffRun
 	LastErr error
 	*k8s.ResourceHelper
 }
-
-var (
-	currentDiffsGauge = prometheus.NewGaugeVec(prometheus.GaugeOpts{
-		Name: "kontrast_current_diffs",
-		Help: "Number of diffs between manifests and cluster",
-	}, []string{objectLabel, nsLabel})
-)
 
 func (dm *DiffManager) DiffRun(path string) (*DiffRun, error) {
 	d := &DiffRun{
@@ -60,18 +49,38 @@ func (dm *DiffManager) DiffRun(path string) (*DiffRun, error) {
 		return nil
 	})
 
+	dm.mu.Lock()
+	defer dm.mu.Unlock()
+
 	d.DiffResult = DiffFromNumber(numDiffs)
 	dm.LastRun = d
 	dm.LastErr = err
 	return d, err
 }
 
-func (dm *DiffManager) processFile(path string) File {
+// GetDiffFiles returns the files which have diffs present
+func (dm *DiffManager) GetDiffFiles() []File {
+	dm.mu.RLock()
+	defer dm.mu.RUnlock()
 
+	files := []File{}
+	if dm.LastRun == nil {
+		return files
+	}
+
+	for _, file := range dm.LastRun.Files {
+		if file.DiffResult.Status == DiffPresent {
+			files = append(files, file)
+		}
+	}
+	return files
+}
+
+func (dm *DiffManager) processFile(path string) File {
 	k8sResources, err := dm.ResourceHelper.NewResourcesFromFilename(path)
 
 	if err != nil {
-		log.Error("Error getting resources: %v\n", err)
+		log.Errorf("Error getting resources: %v\n", err)
 		return File{
 			Name:       path,
 			DiffResult: ErrorDiffStatus(err.Error()),
@@ -98,6 +107,7 @@ func (dm *DiffManager) processResource(k8sr *k8s.Resource) Resource {
 	r := Resource{
 		Name:             k8sr.Name,
 		Namespace:        k8sr.Namespace,
+		Kind:             gvk.Kind,
 		GroupVersionKind: fmt.Sprintf("%s.%s", gvk.Version, gvk.Kind),
 	}
 
@@ -111,23 +121,14 @@ func (dm *DiffManager) processResource(k8sr *k8s.Resource) Resource {
 
 	label := fmt.Sprintf("%s/%s", gvk.Kind, r.Name)
 
-	labelledGauge := currentDiffsGauge.With(prometheus.Labels{
-		objectLabel: label,
-		nsLabel:     k8sr.Namespace,
-	})
-
 	switch d.(type) {
 	case diff.NotPresentOnServerDiff:
 		r.IsNewResource = true
 		r.DiffResult.Status = New
 		r.DiffResult.NumDiffs = 1
-		labelledGauge.Set(1)
 
 	case diff.ChangesPresentDiff:
 		r.DiffResult.NumDiffs = len(d.Deltas())
-
-		// Set the gauge when present, reset when the diff is cleared.
-		labelledGauge.Set(float64(r.DiffResult.NumDiffs))
 
 		if len(d.Deltas()) > 0 {
 			r.DiffResult.Status = DiffPresent
@@ -154,11 +155,11 @@ func DiffFromDelta(delta diff.Delta) Diff {
 
 func NewDiffManager(config *rest.Config) (*DiffManager, error) {
 	helper, err := k8s.NewResourceHelperWithDefaults(config)
-	prometheus.MustRegister(currentDiffsGauge)
 	if err != nil {
 		return &DiffManager{}, err
 	}
 	return &DiffManager{
+		mu:             &sync.RWMutex{},
 		ResourceHelper: helper,
 	}, nil
 }

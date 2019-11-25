@@ -80,7 +80,7 @@ func (dm *DiffManager) processFile(path string) File {
 	k8sResources, err := dm.ResourceHelper.NewResourcesFromFilename(path)
 
 	if err != nil {
-		log.Error("Error getting resources: %v\n", err)
+		log.Errorf("Error getting resources: %v\n", err)
 		return File{
 			Name:       path,
 			DiffResult: ErrorDiffStatus(err.Error()),

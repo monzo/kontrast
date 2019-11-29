@@ -22,6 +22,8 @@ for arch in ${ALL_GOARCH}; do
     file="bin/${NAME}-${VERSION}.${platform}.${arch}"
     echo "Building ${file}"
     CGO_ENABLED=0 GOOS=${platform} GOARCH=${arch} go build -ldflags="-s -w" -o ${file} ./cmd/${NAME}
+    tar czf "${file}.tgz" "${file}"
+    rm "${file}"
   done
 done
 

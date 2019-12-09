@@ -9,18 +9,18 @@ clean:
 
 build:
 	mkdir -p bin/
-	go build -o bin/kontrast ./cmd/kontrast
+	go build -mod vendor -o bin/kontrast ./cmd/kontrast
 
 kontrastd:
 	mkdir -p bin/
-	go build -o bin/kontrastd ./cmd/kontrastd
+	go build -mod vendor -o bin/kontrastd ./cmd/kontrastd
 
 build-in-docker:
-	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o /out/kontrastd ./cmd/kontrastd
+	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -mod vendor -o /out/kontrastd ./cmd/kontrastd
 
 build-linux:
 	mkdir -p bin/
-	GOOS=linux go build -o bin/kontrast ./cmd/kontrast
+	GOOS=linux go build -mod vendor -o bin/kontrast ./cmd/kontrast
 
 docker:
 	docker build . -t $(DOCKER_IMAGE)

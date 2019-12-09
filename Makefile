@@ -5,7 +5,7 @@ DOCKER_TAG ?= latest
 DOCKER_IMAGE ?= $(DOCKER_REPOSITORY)/kontrast:$(DOCKER_TAG)
 
 clean:
-	rm -f bin/
+	rm -rf bin/
 
 build:
 	mkdir -p bin/

@@ -1,8 +1,8 @@
-FROM golang:1.10-alpine3.7 as builder
+FROM golang:1.13.4-alpine as builder
 
 RUN apk add --update-cache git curl mercurial build-base
 
-RUN curl -fsSL -o /usr/local/bin/dep https://github.com/golang/dep/releases/download/v0.5.0/dep-linux-amd64 && chmod +x /usr/local/bin/dep
+RUN curl -fsSL -o /usr/local/bin/dep https://github.com/golang/dep/releases/download/v0.5.4/dep-linux-amd64 && chmod +x /usr/local/bin/dep
 
 RUN mkdir -p /out
 

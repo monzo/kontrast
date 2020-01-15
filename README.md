@@ -12,6 +12,15 @@ Note: this takes a while [1]
 
 `kontrast my-manifest.yaml`
 
+## Note on Developing
+
+If you are running `dep` to introduce a new scheme from a custom Kubernetes resource type, we are aware of at least one upstream repository hosted in BitBucket and expecting [mercurial](https://www.mercurial-scm.org/) to access. Without it installed, `dep` will likely hang and not provide any clues even under verbose mode. 
+
+On macOS, you can install it with Homebrew:
+
+```
+brew install mercurial
+```
 
 ---
 ###### [1] Why does it take so long to build/install? Why is the binary 150MB?

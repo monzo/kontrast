@@ -586,6 +586,14 @@
 
 [[projects]]
   branch = "master"
+  digest = "1:aea11a126da49b3e6a2af495183935ae24107b1aa064e7e517c9b89a86f67d19"
+  name = "github.com/monzo/egress-operator"
+  packages = ["api/v1"]
+  pruneopts = "UT"
+  revision = "ce84a8451de389f41c804cfb0263348d1ea1015c"
+
+[[projects]]
+  branch = "master"
   digest = "1:a6156889b651cc0bf3d9bef82b6ba8fbb9eb19aefd7bc5718357c38b67297cbc"
   name = "github.com/mxk/go-flowrate"
   packages = ["flowrate"]
@@ -1916,11 +1924,20 @@
   pruneopts = "UT"
   revision = "982821ea41da7e7c15f3d3738921eb2e7e241ccd"
 
+[[projects]]
+  digest = "1:c4e8f6509ee8cec911985a812ed3f9cc024404acc45ac613fa103f735cf3222a"
+  name = "sigs.k8s.io/controller-runtime"
+  packages = ["pkg/scheme"]
+  pruneopts = "UT"
+  revision = "198197fe0fd7553cadd8afcd3338f8ee4b8a7e3f"
+  version = "v0.4.0"
+
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
   input-imports = [
     "github.com/dustin/go-humanize",
+    "github.com/monzo/egress-operator/api/v1",
     "github.com/prometheus/client_golang/prometheus",
     "github.com/prometheus/client_golang/prometheus/promhttp",
     "github.com/sergi/go-diff/diffmatchpatch",

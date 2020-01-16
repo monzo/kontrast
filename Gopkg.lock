@@ -652,26 +652,6 @@
   revision = "1555304b9b35fdd2b425bccf1a5613677705e7d0"
 
 [[projects]]
-  digest = "1:3125ace0513bc422d9d4a4424ed691ad7310d6bebb02762dddcd9e2ae8f73eeb"
-  name = "github.com/projectcalico/libcalico-go"
-  packages = [
-    "lib/apis/v1",
-    "lib/apis/v1/unversioned",
-    "lib/apis/v3",
-    "lib/backend/encap",
-    "lib/hash",
-    "lib/net",
-    "lib/numorstring",
-    "lib/scope",
-    "lib/selector",
-    "lib/selector/parser",
-    "lib/selector/tokenizer",
-  ]
-  pruneopts = "UT"
-  revision = "2f397048672d913067e8be03d9d9077788bc8a0a"
-  version = "v3.12.0-0.dev"
-
-[[projects]]
   digest = "1:d14a5f4bfecf017cb780bdde1b6483e5deb87e12c332544d2c430eda58734bcb"
   name = "github.com/prometheus/client_golang"
   packages = [
@@ -1958,7 +1938,6 @@
   input-imports = [
     "github.com/dustin/go-humanize",
     "github.com/monzo/egress-operator/api/v1",
-    "github.com/projectcalico/libcalico-go/lib/apis/v3",
     "github.com/prometheus/client_golang/prometheus",
     "github.com/prometheus/client_golang/prometheus/promhttp",
     "github.com/sergi/go-diff/diffmatchpatch",

@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	egressoperatorscheme "github.com/monzo/egress-operator/api/v1"
+	calicoscheme "github.com/projectcalico/libcalico-go/lib/apis/v3"
 	v1 "k8s.io/api/core/v1"
 	crdscheme "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset/scheme"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -42,6 +43,7 @@ func init() {
 	apiservicescheme.AddToScheme(scheme.Scheme)
 	crdscheme.AddToScheme(scheme.Scheme)
 	egressoperatorscheme.AddToScheme(scheme.Scheme)
+	calicoscheme.AddToScheme(scheme.Scheme)
 }
 
 func NewResourceHelperWithDefaults(config *rest.Config) (*ResourceHelper, error) {

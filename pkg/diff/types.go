@@ -22,6 +22,7 @@ func (d Delta) Key() string {
 type Diff interface {
 	Deltas() []Delta
 	Pretty(colorEnabled bool) string
+	DiffMeta() DiffMeta
 }
 
 type DiffMeta struct {
@@ -29,10 +30,14 @@ type DiffMeta struct {
 }
 
 type ChangesPresentDiff struct {
-	DiffMeta
-	deltas []Delta
+	diffMeta DiffMeta
+	deltas   []Delta
 }
 
 type NotPresentOnServerDiff struct {
-	DiffMeta
+	diffMeta DiffMeta
+}
+
+type UnchangedDiff struct {
+	diffMeta DiffMeta
 }

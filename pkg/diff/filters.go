@@ -15,6 +15,7 @@ var filters = []*regexp.Regexp{
 	regexp.MustCompile(`spec.template.metadata.annotations.pod.alpha.kubernetes.io/init-containers`),
 	regexp.MustCompile(`spec.template.metadata.annotations.pod.beta.kubernetes.io/init-containers`),
 	regexp.MustCompile(`spec.template.metadata.annotations.kubectl.kubernetes.io/restartedAt`),
+	regexp.MustCompile(`spec\.additionalPrinterColumns`),
 	regexp.MustCompile(`spec\.jobTemplate\.spec\.backoffLimit`),
 	regexp.MustCompile(`spec\.template\.spec\.volumes\.[0-9]+\.hostPath\.type`),
 	regexp.MustCompile(`spec\.template\.spec\.volumes\.[0-9]+\.emptyDir\.sizeLimit`),
@@ -23,6 +24,7 @@ var filters = []*regexp.Regexp{
 	regexp.MustCompile(`spec\.revisionHistoryLimit`),
 	regexp.MustCompile(`spec\.ports\.[0-9]+\.nodePort`),
 	regexp.MustCompile(`spec\.(clusterIP|volumeName)`),
+	regexp.MustCompile(`spec\.finalizers`),
 	regexp.MustCompile(`secrets`),
 	regexp.MustCompile(`status.*`),
 }

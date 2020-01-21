@@ -129,13 +129,12 @@ func (dm *DiffManager) processResource(k8sr *k8s.Resource) Resource {
 
 	case diff.ChangesPresentDiff:
 		r.DiffResult.NumDiffs = len(d.Deltas())
+		r.DiffResult.Status = DiffPresent
+		log.Infof("Found a diff in: %v\n", label)
 
-		if len(d.Deltas()) > 0 {
-			r.DiffResult.Status = DiffPresent
-			log.Infof("Found a diff in: %v\n", label)
-		} else {
-			r.DiffResult.Status = Clean
-		}
+	case diff.UnchangedDiff:
+		r.DiffResult.NumDiffs = 0
+		r.DiffResult.Status = Clean
 	}
 
 	for _, delta := range d.Deltas() {

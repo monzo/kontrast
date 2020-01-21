@@ -24,6 +24,7 @@ var filters = []*regexp.Regexp{
 	regexp.MustCompile(`spec\.revisionHistoryLimit`),
 	regexp.MustCompile(`spec\.ports\.[0-9]+\.nodePort`),
 	regexp.MustCompile(`spec\.(clusterIP|volumeName)`),
+	regexp.MustCompile(`spec\.finalizers`),
 	regexp.MustCompile(`secrets`),
 	regexp.MustCompile(`status.*`),
 }
